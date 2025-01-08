@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Media Organizer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
+        header {
+            background-color: #6200ea;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+        main {
+            padding: 2rem;
+        }
+        .upload-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+        .media-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .media-item {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            width: calc(33.333% - 1rem);
+            box-sizing: border-box;
+        }
+        .media-item img, .media-item video, .media-item audio {
+            max-width: 100%;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Media Organizer</h1>
+        <p>Upload and organize your videos, audio, photos, and text files.</p>
+    </header>
+    <main>
+        <section class="upload-section">
+            <h2>Upload Media</h2>
+            <form id="uploadForm">
+                <label>
+                    Select File:
+                    <input type="file" id="mediaInput" accept="image/*,video/*,audio/*,.txt" required>
+                </label>
+                <br><br>
+                <label>
+                    Add Description:
+                    <textarea id="description" placeholder="Add a description..."></textarea>
+                </label>
+                <br><br>
+                <button type="submit">Upload</button>
+            </form>
+        </section>
+
+        <section class="media-list" id="mediaList">
+            <!-- Media items will appear here -->
+        </section>
+    </main>
+
+    <script>
+        const uploadForm = document.getElementById('uploadForm');
+        const mediaList = document.getElementById('mediaList');
+
+        uploadForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const fileInput = document.getElementById('mediaInput');
+            const description = document.getElementById('description').value;
+            const file = fileInput.files[0];
+
+            if (file) {
+                const mediaItem = document.createElement('div');
+                mediaItem.classList.add('media-item');
+
+                if (file.type.startsWith('image/')) {
+                    const img = document.createElement('img');
+                    img.src = URL.createObjectURL(file);
+                    mediaItem.appendChild(img);
+                } else if (file.type.startsWith('video/')) {
+                    const video = document.createElement('video');
+                    video.src = URL.createObjectURL(file);
+                    video.controls = true;
+                    mediaItem.appendChild(video);
+                } else if (file.type.startsWith('audio/')) {
+                    const audio = document.createElement('audio');
+                    audio.src = URL.createObjectURL(file);
+                    audio.controls = true;
+                    mediaItem.appendChild(audio);
+                } else if (file.type === 'text/plain') {
+                    const text = document.createElement('p');
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                        text.textContent = reader.result;
+                    };
+                    reader.readAsText(file);
+                    mediaItem.appendChild(text);
+                }
+
+                const desc = document.createElement('p');
+                desc.textContent = description;
+                mediaItem.appendChild(desc);
+
+                mediaList.appendChild(mediaItem);
+
+                // Reset the form
+                uploadForm.reset();
+            }
+        });
+    </script>
+</body>
+</html>
