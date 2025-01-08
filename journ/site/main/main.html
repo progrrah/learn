@@ -3,7 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration</title>
+    <script src="https://yastatic.net/s3/passport-sdk/autofill/v1/sdk-suggest-with-polyfills-latest.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
+        header {
+            background-color: #6200ea;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+        main {
+            padding: 2rem;
+        }
+        .form-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            margin: 2rem auto;
+        }
+        label {
+            display: block;
+            margin-bottom: 1rem;
+        }
+        input, button {
+            width: 100%;
+            padding: 0.5rem;
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Registration Page</h1>
+        <p>Create your account to access the Media Organizer</p>
+    </header>
+    <main>
+        <section class="form-section">
+            <form id="registrationForm">
+                <label>
+                    Username:
+                    <input type="text" id="username" required>
+                </label>
+                <label>
+                    Password:
+                    <input type="password" id="password" required>
+                </label>
+                <button type="submit">Register</button>
+            </form>
+        </section>
+    </main>
+    <script>
+        const registrationForm = document.getElementById('registrationForm');
+        registrationForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            // Simple user data simulation
+            localStorage.setItem('user', JSON.stringify({ username, password }));
+
+            // Redirect to main interface
+            window.location.href = 'main.html';
+        });
+    </script>
+</body>
+</html>
+
+<!-- MAIN.HTML -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Media Organizer</title>
+    <script src="https://yastatic.net/s3/passport-sdk/autofill/v1/sdk-suggest-with-polyfills-latest.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -75,6 +157,16 @@
     </main>
 
     <script>
+        // Check user authentication
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user) {
+            alert('Please register first!');
+            window.location.href = 'index.html';
+        }
+
+        // Simulated database as an array
+        const database = [];
+
         const uploadForm = document.getElementById('uploadForm');
         const mediaList = document.getElementById('mediaList');
         const YANDEX_DISK_API_URL = 'https://cloud-api.yandex.net/v1/disk/resources/upload';
@@ -113,7 +205,16 @@
                         throw new Error('Failed to upload file to Yandex Disk');
                     }
 
-                    // Step 3: Display the uploaded file in the media list
+                    // Step 3: Save file details to the simulated database
+                    const mediaData = {
+                        name: file.name,
+                        type: file.type,
+                        description: description,
+                        uploadedAt: new Date().toISOString()
+                    };
+                    database.push(mediaData);
+
+                    // Step 4: Display the uploaded file in the media list
                     const mediaItem = document.createElement('div');
                     mediaItem.classList.add('media-item');
 
@@ -146,6 +247,8 @@
                     mediaItem.appendChild(desc);
 
                     mediaList.appendChild(mediaItem);
+
+                    console.log('Current Database:', database);
 
                     // Reset the form
                     uploadForm.reset();
