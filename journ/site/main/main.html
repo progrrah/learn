@@ -48,10 +48,6 @@
         .sort-section {
             margin-bottom: 1rem;
         }
-        .error-message {
-            color: red;
-            font-weight: bold;
-        }
     </style>
 </head>
 <body>
@@ -75,7 +71,6 @@
                 <br><br>
                 <button type="submit">Upload</button>
             </form>
-            <div class="error-message" id="uploadError"></div>
         </section>
 
         <section class="sort-section">
@@ -95,16 +90,22 @@
     </main>
 
     <script>
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user) {
+            alert('Please register first!');
+            window.location.href = 'index.html';
+        }
+
         const YANDEX_DISK_API_URL = 'https://cloud-api.yandex.net/v1/disk/resources';
-        const OAUTH_TOKEN = 'y0__wgBEImhkZkDGNGhNCDC-OL9EUk1L947SmaybN0F3_ooOmB2Dn6N';
+        const OAUTH_TOKEN = localStorage.getItem('oauthToken'); // Get token from localStorage
         const uploadForm = document.getElementById('uploadForm');
         const mediaList = document.getElementById('mediaList');
         const sortCriteria = document.getElementById('sortCriteria');
         const sortButton = document.getElementById('sortButton');
-        const uploadError = document.getElementById('uploadError');
         let mediaItems = [];
 
         async function fetchMediaList() {
+            console.log('Fetching media list from Yandex Disk...');
             try {
                 const response = await fetch(`${YANDEX_DISK_API_URL}/files?limit=100`, {
                     method: 'GET',
@@ -118,15 +119,16 @@
                 }
 
                 const { items } = await response.json();
+                console.log('Media list fetched successfully:', items);
                 mediaItems = items;
                 displayMediaItems(items);
             } catch (error) {
                 console.error('Error fetching media list:', error);
-                alert('Failed to load media list. Please check your connection or token.');
             }
         }
 
         async function getDownloadUrl(path) {
+            console.log(`Fetching download URL for path: ${path}`);
             try {
                 const response = await fetch(`${YANDEX_DISK_API_URL}/download?path=${encodeURIComponent(path)}`, {
                     method: 'GET',
@@ -140,6 +142,7 @@
                 }
 
                 const { href } = await response.json();
+                console.log(`Download URL for ${path}:`, href);
                 return href;
             } catch (error) {
                 console.error('Error getting download URL:', error);
@@ -147,6 +150,7 @@
         }
 
         async function displayMediaItems(items) {
+            console.log('Displaying media items...');
             mediaList.innerHTML = '';
             for (const item of items) {
                 const mediaItem = document.createElement('div');
@@ -182,15 +186,18 @@
 
                 mediaList.appendChild(mediaItem);
             }
+            console.log('Media items displayed.');
         }
 
         uploadForm.addEventListener('submit', async (e) => {
             e.preventDefault();
 
             const fileInput = document.getElementById('mediaInput');
+            const description = document.getElementById('description').value;
             const file = fileInput.files[0];
 
             if (file) {
+                console.log(`Uploading file: ${file.name}`);
                 try {
                     const uploadLinkResponse = await fetch(`${YANDEX_DISK_API_URL}/upload?path=${encodeURIComponent(file.name)}&overwrite=true`, {
                         method: 'GET',
@@ -204,6 +211,7 @@
                     }
 
                     const { href } = await uploadLinkResponse.json();
+                    console.log(`Upload URL: ${href}`);
 
                     const uploadResponse = await fetch(href, {
                         method: 'PUT',
@@ -219,12 +227,12 @@
                     fetchMediaList(); // Refresh media list
                 } catch (error) {
                     console.error('Error uploading file:', error);
-                    uploadError.textContent = 'Error uploading file. Please try again.';
                 }
             }
         });
 
         sortButton.addEventListener('click', () => {
+            console.log('Sorting media items...');
             const criteria = sortCriteria.value;
             const sortedItems = [...mediaItems];
 
@@ -241,6 +249,7 @@
                 return 0;
             });
 
+            console.log('Media items sorted by:', criteria);
             displayMediaItems(sortedItems);
         });
 
