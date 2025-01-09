@@ -5,28 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Audio Manager</title>
     <style>
-        /* Basic styles for the body and general layout */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
             background-color: #f4f4f9;
         }
-        
-        /* Header styles */
         header {
             background-color: #6200ea;
             color: white;
             padding: 1rem;
             text-align: center;
         }
-        
-        /* Main content area */
         main {
             padding: 2rem;
         }
-        
-        /* Styles for the upload section */
         .upload-section {
             background: white;
             padding: 2rem;
@@ -34,15 +27,11 @@
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             margin-bottom: 2rem;
         }
-        
-        /* Styles for the list of audio items */
         .audio-list {
             display: flex;
             flex-wrap: wrap;
             gap: 1rem;
         }
-        
-        /* Individual audio item styles */
         .audio-item {
             background: white;
             padding: 1rem;
@@ -51,14 +40,10 @@
             width: calc(33.333% - 1rem);
             box-sizing: border-box;
         }
-        
-        /* Ensure audio player spans full width */
         .audio-item audio {
             width: 100%;
             border-radius: 4px;
         }
-        
-        /* Metadata section within audio items */
         .metadata {
             margin-top: 1rem;
         }
@@ -73,19 +58,16 @@
         <section class="upload-section">
             <h2>Upload Audio</h2>
             <form id="uploadForm">
-                <!-- File input for audio files -->
                 <label>
                     Select File:
                     <input type="file" id="audioInput" accept="audio/*" required>
                 </label>
                 <br><br>
-                <!-- Textarea for additional metadata -->
                 <label>
                     Add Metadata:
                     <textarea id="metadata" placeholder="Add metadata (e.g., title, genre, description)..."></textarea>
                 </label>
                 <br><br>
-                <!-- Upload button -->
                 <button type="submit">Upload</button>
             </form>
         </section>
@@ -98,65 +80,102 @@
     <script>
         const uploadForm = document.getElementById('uploadForm');
         const audioList = document.getElementById('audioList');
-        const AUDIO_STORAGE_KEY = 'audioFiles'; // Key for localStorage
+        const AUDIO_STORAGE_KEY = 'audioFiles';
+        const YANDEX_DISK_TOKEN = 'y0__wgBEImhkZkDGNGhNCDC-OL9EUk1L947SmaybN0F3_ooOmB2Dn6N';
 
         // Load audio items from local storage
         function loadAudioItems() {
             const storedAudio = JSON.parse(localStorage.getItem(AUDIO_STORAGE_KEY)) || [];
-            audioList.innerHTML = ''; // Clear current list
+            audioList.innerHTML = '';
 
-            // Create elements for each stored audio item
             storedAudio.forEach(item => {
                 const audioItem = document.createElement('div');
                 audioItem.classList.add('audio-item');
 
-                // Add audio player
                 const audio = document.createElement('audio');
                 audio.src = item.url;
                 audio.controls = true;
                 audioItem.appendChild(audio);
 
-                // Add metadata
                 const metadata = document.createElement('div');
                 metadata.classList.add('metadata');
                 metadata.innerHTML = `<strong>${item.metadata}</strong>`;
                 audioItem.appendChild(metadata);
 
-                audioList.appendChild(audioItem); // Append to list
+                audioList.appendChild(audioItem);
             });
         }
 
-        // Save new audio item to local storage
+        // Save audio items to local storage
         function saveAudioItem(url, metadata) {
             const storedAudio = JSON.parse(localStorage.getItem(AUDIO_STORAGE_KEY)) || [];
-            storedAudio.push({ url, metadata }); // Add new item
+            storedAudio.push({ url, metadata });
             localStorage.setItem(AUDIO_STORAGE_KEY, JSON.stringify(storedAudio));
         }
 
-        // Handle form submission for uploading audio
-        uploadForm.addEventListener('submit', event => {
-            event.preventDefault(); // Prevent default form submission
+        // Upload file to Yandex Disk
+        async function uploadToYandexDisk(file, fileName) {
+            const uploadUrl = `https://cloud-api.yandex.net/v1/disk/resources/upload?path=${encodeURIComponent(fileName)}&overwrite=true`;
+
+            // Step 1: Get upload link
+            const response = await fetch(uploadUrl, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `OAuth ${YANDEX_DISK_TOKEN}`
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to get upload URL');
+            }
+
+            const data = await response.json();
+
+            // Step 2: Upload file to the provided link
+            const uploadResponse = await fetch(data.href, {
+                method: 'PUT',
+                body: file
+            });
+
+            if (!uploadResponse.ok) {
+                throw new Error('Failed to upload file to Yandex Disk');
+            }
+
+            alert('File uploaded to Yandex Disk successfully!');
+        }
+
+        // Handle form submission
+        uploadForm.addEventListener('submit', async event => {
+            event.preventDefault();
 
             const fileInput = document.getElementById('audioInput');
             const metadataInput = document.getElementById('metadata');
-            const file = fileInput.files[0]; // Get the selected file
+            const file = fileInput.files[0];
 
             if (file) {
-                const reader = new FileReader();
+                try {
+                    const reader = new FileReader();
 
-                // When file is read, save it and update the list
-                reader.onload = () => {
-                    const url = reader.result; // Get file content as data URL
-                    const metadata = metadataInput.value || 'No metadata provided';
+                    reader.onload = async () => {
+                        const url = reader.result;
+                        const metadata = metadataInput.value || 'No metadata provided';
 
-                    saveAudioItem(url, metadata); // Save to localStorage
-                    loadAudioItems(); // Refresh the list
+                        // Save locally
+                        saveAudioItem(url, metadata);
 
-                    uploadForm.reset(); // Reset the form
-                    alert('Audio uploaded successfully!');
-                };
+                        // Save to Yandex Disk
+                        await uploadToYandexDisk(file, file.name);
 
-                reader.readAsDataURL(file); // Read the file
+                        // Refresh UI
+                        loadAudioItems();
+                        uploadForm.reset();
+                    };
+
+                    reader.readAsDataURL(file);
+                } catch (error) {
+                    console.error('Error uploading file:', error);
+                    alert('Failed to upload file. Please try again.');
+                }
             } else {
                 alert('Please select a file to upload.');
             }
