@@ -40,7 +40,6 @@
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             width: calc(33.333% - 1rem);
             box-sizing: border-box;
-            position: relative;
         }
         .media-item img, .media-item video, .media-item audio {
             max-width: 100%;
@@ -48,39 +47,6 @@
         }
         .sort-section {
             margin-bottom: 1rem;
-        }
-        .preview-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            display: none;
-            justify-content: center;
-            align-items: center;
-        }
-        .preview-modal.active {
-            display: flex;
-        }
-        .preview-content {
-            background: white;
-            padding: 1rem;
-            border-radius: 8px;
-            max-width: 90%;
-            max-height: 90%;
-            overflow: auto;
-        }
-        .close-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: red;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            padding: 0.5rem;
-            cursor: pointer;
         }
     </style>
 </head>
@@ -123,34 +89,26 @@
         </section>
     </main>
 
-    <div class="preview-modal" id="previewModal">
-        <div class="preview-content" id="previewContent">
-            <!-- Preview content will appear here -->
-        </div>
-        <button class="close-btn" id="closePreview">Close</button>
-    </div>
-
     <script>
         // Check user authentication
         const user = JSON.parse(localStorage.getItem('user'));
         if (!user) {
+            console.log('No user found. Redirecting to registration page.');
             alert('Please register first!');
             window.location.href = 'index.html';
         }
 
         const YANDEX_DISK_API_URL = 'https://cloud-api.yandex.net/v1/disk/resources';
-        const OAUTH_TOKEN = 'y0__wgBEImhkZkDGNGhNCDC-OL9EUk1L947SmaybN0F3_ooOmB2Dn6N';
+        const OAUTH_TOKEN = 'y0__wgBEImhkZkDGNGhNCDC-OL9EUk1L947SmaybN0F3_ooOmB2Dn6N'; // Replace with valid token
         const uploadForm = document.getElementById('uploadForm');
         const mediaList = document.getElementById('mediaList');
         const sortCriteria = document.getElementById('sortCriteria');
         const sortButton = document.getElementById('sortButton');
-        const previewModal = document.getElementById('previewModal');
-        const previewContent = document.getElementById('previewContent');
-        const closePreview = document.getElementById('closePreview');
         let mediaItems = [];
 
         async function fetchMediaList() {
             try {
+                console.log('Fetching media list from Yandex Disk...');
                 const response = await fetch(`${YANDEX_DISK_API_URL}/files?limit=100`, {
                     method: 'GET',
                     headers: {
@@ -163,6 +121,7 @@
                 }
 
                 const { items } = await response.json();
+                console.log('Media list fetched successfully:', items);
                 mediaItems = items;
                 displayMediaItems(items);
             } catch (error) {
@@ -170,40 +129,57 @@
             }
         }
 
-        function displayMediaItems(items) {
+        async function getDownloadUrl(path) {
+            try {
+                console.log(`Getting download URL for path: ${path}`);
+                const response = await fetch(`${YANDEX_DISK_API_URL}/download?path=${encodeURIComponent(path)}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `OAuth ${OAUTH_TOKEN}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to get download URL');
+                }
+
+                const { href } = await response.json();
+                console.log(`Download URL for ${path}: ${href}`);
+                return href;
+            } catch (error) {
+                console.error('Error getting download URL:', error);
+            }
+        }
+
+        async function displayMediaItems(items) {
+            console.log('Displaying media items...');
             mediaList.innerHTML = '';
-            items.forEach(item => {
+            for (const item of items) {
                 const mediaItem = document.createElement('div');
                 mediaItem.classList.add('media-item');
 
+                const downloadUrl = await getDownloadUrl(item.path);
+
                 if (item.mime_type.startsWith('image/')) {
                     const img = document.createElement('img');
-                    img.src = item.file;
-                    img.alt = item.name;
-                    img.addEventListener('click', () => previewMedia(item));
+                    img.src = downloadUrl;
                     mediaItem.appendChild(img);
                 } else if (item.mime_type.startsWith('video/')) {
                     const video = document.createElement('video');
-                    video.src = item.file;
+                    video.src = downloadUrl;
                     video.controls = true;
-                    video.addEventListener('click', () => previewMedia(item));
                     mediaItem.appendChild(video);
                 } else if (item.mime_type.startsWith('audio/')) {
                     const audio = document.createElement('audio');
-                    audio.src = item.file;
+                    audio.src = downloadUrl;
                     audio.controls = true;
-                    audio.addEventListener('click', () => previewMedia(item));
                     mediaItem.appendChild(audio);
                 } else if (item.mime_type === 'text/plain') {
-                    const textLink = document.createElement('a');
-                    textLink.href = item.file;
-                    textLink.textContent = item.name;
-                    textLink.target = '_blank';
-                    textLink.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        previewMedia(item);
-                    });
-                    mediaItem.appendChild(textLink);
+                    const link = document.createElement('a');
+                    link.href = downloadUrl;
+                    link.textContent = item.name;
+                    link.target = '_blank';
+                    mediaItem.appendChild(link);
                 }
 
                 const desc = document.createElement('p');
@@ -211,42 +187,8 @@
                 mediaItem.appendChild(desc);
 
                 mediaList.appendChild(mediaItem);
-            });
-        }
-
-        function previewMedia(item) {
-            previewContent.innerHTML = '';
-            if (item.mime_type.startsWith('image/')) {
-                const img = document.createElement('img');
-                img.src = item.file;
-                img.alt = item.name;
-                previewContent.appendChild(img);
-            } else if (item.mime_type.startsWith('video/')) {
-                const video = document.createElement('video');
-                video.src = item.file;
-                video.controls = true;
-                video.autoplay = true;
-                previewContent.appendChild(video);
-            } else if (item.mime_type.startsWith('audio/')) {
-                const audio = document.createElement('audio');
-                audio.src = item.file;
-                audio.controls = true;
-                audio.autoplay = true;
-                previewContent.appendChild(audio);
-            } else if (item.mime_type === 'text/plain') {
-                const iframe = document.createElement('iframe');
-                iframe.src = item.file;
-                iframe.style.width = '100%';
-                iframe.style.height = '100%';
-                previewContent.appendChild(iframe);
             }
-
-            previewModal.classList.add('active');
         }
-
-        closePreview.addEventListener('click', () => {
-            previewModal.classList.remove('active');
-        });
 
         uploadForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -257,6 +199,7 @@
 
             if (file) {
                 try {
+                    console.log('Uploading file:', file.name);
                     const uploadLinkResponse = await fetch(`${YANDEX_DISK_API_URL}/upload?path=${encodeURIComponent(file.name)}&overwrite=true`, {
                         method: 'GET',
                         headers: {
@@ -269,6 +212,7 @@
                     }
 
                     const { href } = await uploadLinkResponse.json();
+                    console.log('Upload URL received:', href);
 
                     const uploadResponse = await fetch(href, {
                         method: 'PUT',
@@ -279,6 +223,7 @@
                         throw new Error('Failed to upload file to Yandex Disk');
                     }
 
+                    console.log('File uploaded successfully:', file.name);
                     alert('File uploaded successfully!');
                     uploadForm.reset();
                     fetchMediaList(); // Refresh media list
@@ -289,6 +234,7 @@
         });
 
         sortButton.addEventListener('click', () => {
+            console.log('Sorting media items by:', sortCriteria.value);
             const criteria = sortCriteria.value;
             const sortedItems = [...mediaItems];
 
@@ -305,10 +251,12 @@
                 return 0;
             });
 
+            console.log('Sorted media items:', sortedItems);
             displayMediaItems(sortedItems);
         });
 
         // Load media list on page load
+        console.log('Initializing page. Fetching media list...');
         fetchMediaList();
     </script>
 </body>
