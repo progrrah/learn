@@ -1,4 +1,3 @@
-<!-- Main Interface Page: main.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -84,13 +83,62 @@
             window.location.href = 'index.html';
         }
 
-        // Simulated database as an array
-        const database = [];
-
+        const YANDEX_DISK_API_URL = 'https://cloud-api.yandex.net/v1/disk/resources';
+        const OAUTH_TOKEN = 'your_oauth_token_here'; // Replace with your Yandex Disk OAuth token
         const uploadForm = document.getElementById('uploadForm');
         const mediaList = document.getElementById('mediaList');
-        const YANDEX_DISK_API_URL = 'https://cloud-api.yandex.net/v1/disk/resources/upload';
-        const OAUTH_TOKEN = 'y0__wgBEImhkZkDGNGhNCDC-OL9EUk1L947SmaybN0F3_ooOmB2Dn6N'; // Replace with your Yandex Disk OAuth token
+
+        async function fetchMediaList() {
+            try {
+                const response = await fetch(`${YANDEX_DISK_API_URL}/files?limit=100`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `OAuth ${OAUTH_TOKEN}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch media list from Yandex Disk');
+                }
+
+                const { items } = await response.json();
+
+                // Display fetched media items
+                mediaList.innerHTML = '';
+                items.forEach(item => {
+                    const mediaItem = document.createElement('div');
+                    mediaItem.classList.add('media-item');
+
+                    if (item.mime_type.startsWith('image/')) {
+                        const img = document.createElement('img');
+                        img.src = item.file;
+                        mediaItem.appendChild(img);
+                    } else if (item.mime_type.startsWith('video/')) {
+                        const video = document.createElement('video');
+                        video.src = item.file;
+                        video.controls = true;
+                        mediaItem.appendChild(video);
+                    } else if (item.mime_type.startsWith('audio/')) {
+                        const audio = document.createElement('audio');
+                        audio.src = item.file;
+                        audio.controls = true;
+                        mediaItem.appendChild(audio);
+                    } else if (item.mime_type === 'text/plain') {
+                        const text = document.createElement('p');
+                        text.textContent = item.name;
+                        mediaItem.appendChild(text);
+                    }
+
+                    const desc = document.createElement('p');
+                    desc.textContent = item.name;
+                    mediaItem.appendChild(desc);
+
+                    mediaList.appendChild(mediaItem);
+                });
+            } catch (error) {
+                console.error('Error fetching media list:', error);
+            }
+        }
 
         uploadForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -101,21 +149,19 @@
 
             if (file) {
                 try {
-                    // Step 1: Get upload link from Yandex Disk API
-                    const response = await fetch(`${YANDEX_DISK_API_URL}?path=${encodeURIComponent(file.name)}`, {
+                    const uploadLinkResponse = await fetch(`${YANDEX_DISK_API_URL}/upload?path=${encodeURIComponent(file.name)}&overwrite=true`, {
                         method: 'GET',
                         headers: {
                             'Authorization': `OAuth ${OAUTH_TOKEN}`
                         }
                     });
 
-                    if (!response.ok) {
+                    if (!uploadLinkResponse.ok) {
                         throw new Error('Failed to get upload URL from Yandex Disk');
                     }
 
-                    const { href } = await response.json();
+                    const { href } = await uploadLinkResponse.json();
 
-                    // Step 2: Upload the file to the received URL
                     const uploadResponse = await fetch(href, {
                         method: 'PUT',
                         body: file
@@ -125,58 +171,17 @@
                         throw new Error('Failed to upload file to Yandex Disk');
                     }
 
-                    // Step 3: Save file details to the simulated database
-                    const mediaData = {
-                        name: file.name,
-                        type: file.type,
-                        description: description,
-                        uploadedAt: new Date().toISOString()
-                    };
-                    database.push(mediaData);
-
-                    // Step 4: Display the uploaded file in the media list
-                    const mediaItem = document.createElement('div');
-                    mediaItem.classList.add('media-item');
-
-                    if (file.type.startsWith('image/')) {
-                        const img = document.createElement('img');
-                        img.src = URL.createObjectURL(file);
-                        mediaItem.appendChild(img);
-                    } else if (file.type.startsWith('video/')) {
-                        const video = document.createElement('video');
-                        video.src = URL.createObjectURL(file);
-                        video.controls = true;
-                        mediaItem.appendChild(video);
-                    } else if (file.type.startsWith('audio/')) {
-                        const audio = document.createElement('audio');
-                        audio.src = URL.createObjectURL(file);
-                        audio.controls = true;
-                        mediaItem.appendChild(audio);
-                    } else if (file.type === 'text/plain') {
-                        const text = document.createElement('p');
-                        const reader = new FileReader();
-                        reader.onload = () => {
-                            text.textContent = reader.result;
-                        };
-                        reader.readAsText(file);
-                        mediaItem.appendChild(text);
-                    }
-
-                    const desc = document.createElement('p');
-                    desc.textContent = description;
-                    mediaItem.appendChild(desc);
-
-                    mediaList.appendChild(mediaItem);
-
-                    console.log('Current Database:', database);
-
-                    // Reset the form
+                    alert('File uploaded successfully!');
                     uploadForm.reset();
+                    fetchMediaList(); // Refresh media list
                 } catch (error) {
                     console.error('Error uploading file:', error);
                 }
             }
         });
+
+        // Load media list on page load
+        fetchMediaList();
     </script>
 </body>
 </html>
