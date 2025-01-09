@@ -10,18 +10,22 @@ app.use(cors());
 
 // Основной маршрут прокси
 app.get('/proxy', async (req, res) => {
-    const targetUrl = req.query.url;
+    const targetUrl = req.query.url; // Целевой URL
+    const path = req.query.path;    // Обязательный параметр `path`
 
-    // Проверяем, указан ли целевой URL
-    if (!targetUrl) {
-        return res.status(400).json({ error: 'URL is required as a query parameter' });
+    // Проверяем, указан ли целевой URL и путь
+    if (!targetUrl || !path) {
+        return res.status(400).json({ error: 'URL and path are required as query parameters' });
     }
 
     try {
         // Запрос к целевому URL
         const response = await axios.get(targetUrl, {
             headers: {
-                Authorization: `y0__wgBEImhkZkDGO-hNCDqt_n9Ea0IKBgtCJAfxRzUIbosIgOc7-o6`, // Замените на ваш токен
+                Authorization: `OAuth y0__wgBEImhkZkDGO-hNCDqt_n9Ea0IKBgtCJAfxRzUIbosIgOc7-o6`, // Ваш токен
+            },
+            params: {
+                path: path, // Добавление параметра `path` в запрос
             },
         });
 
