@@ -45,58 +45,42 @@
         .media-item img, .media-item video, .media-item audio {
             max-width: 100%;
             border-radius: 4px;
-            margin-bottom: 0.5rem;
-        }
-        .media-item .preview-button {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: #6200ea;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            padding: 0.5rem;
-            cursor: pointer;
-        }
-        .media-item .preview-button:hover {
-            background: #3700b3;
         }
         .sort-section {
             margin-bottom: 1rem;
         }
-        #previewModal {
-            display: none;
+        .preview-modal {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
             justify-content: center;
             align-items: center;
-            z-index: 1000;
         }
-        #previewModalContent {
+        .preview-modal.active {
+            display: flex;
+        }
+        .preview-content {
             background: white;
-            padding: 2rem;
+            padding: 1rem;
             border-radius: 8px;
             max-width: 90%;
             max-height: 90%;
             overflow: auto;
         }
-        #previewModalClose {
+        .close-btn {
             position: absolute;
             top: 10px;
             right: 10px;
-            background: #6200ea;
+            background: red;
             color: white;
             border: none;
             border-radius: 4px;
             padding: 0.5rem;
             cursor: pointer;
-        }
-        #previewModalClose:hover {
-            background: #3700b3;
         }
     </style>
 </head>
@@ -139,14 +123,15 @@
         </section>
     </main>
 
-    <div id="previewModal">
-        <div id="previewModalContent">
-            <button id="previewModalClose">Close</button>
-            <div id="previewContent"></div>
+    <div class="preview-modal" id="previewModal">
+        <div class="preview-content" id="previewContent">
+            <!-- Preview content will appear here -->
         </div>
+        <button class="close-btn" id="closePreview">Close</button>
     </div>
 
     <script>
+        // Check user authentication
         const user = JSON.parse(localStorage.getItem('user'));
         if (!user) {
             alert('Please register first!');
@@ -161,8 +146,7 @@
         const sortButton = document.getElementById('sortButton');
         const previewModal = document.getElementById('previewModal');
         const previewContent = document.getElementById('previewContent');
-        const previewModalClose = document.getElementById('previewModalClose');
-
+        const closePreview = document.getElementById('closePreview');
         let mediaItems = [];
 
         async function fetchMediaList() {
@@ -195,64 +179,73 @@
                 if (item.mime_type.startsWith('image/')) {
                     const img = document.createElement('img');
                     img.src = item.file;
+                    img.alt = item.name;
+                    img.addEventListener('click', () => previewMedia(item));
                     mediaItem.appendChild(img);
                 } else if (item.mime_type.startsWith('video/')) {
                     const video = document.createElement('video');
                     video.src = item.file;
                     video.controls = true;
+                    video.addEventListener('click', () => previewMedia(item));
                     mediaItem.appendChild(video);
                 } else if (item.mime_type.startsWith('audio/')) {
                     const audio = document.createElement('audio');
                     audio.src = item.file;
                     audio.controls = true;
+                    audio.addEventListener('click', () => previewMedia(item));
                     mediaItem.appendChild(audio);
                 } else if (item.mime_type === 'text/plain') {
-                    const text = document.createElement('p');
-                    text.textContent = item.name;
-                    mediaItem.appendChild(text);
+                    const textLink = document.createElement('a');
+                    textLink.href = item.file;
+                    textLink.textContent = item.name;
+                    textLink.target = '_blank';
+                    textLink.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        previewMedia(item);
+                    });
+                    mediaItem.appendChild(textLink);
                 }
 
                 const desc = document.createElement('p');
                 desc.textContent = item.name;
                 mediaItem.appendChild(desc);
 
-                const previewButton = document.createElement('button');
-                previewButton.textContent = 'Preview';
-                previewButton.classList.add('preview-button');
-                previewButton.addEventListener('click', () => openPreview(item));
-                mediaItem.appendChild(previewButton);
-
                 mediaList.appendChild(mediaItem);
             });
         }
 
-        function openPreview(item) {
+        function previewMedia(item) {
             previewContent.innerHTML = '';
             if (item.mime_type.startsWith('image/')) {
                 const img = document.createElement('img');
                 img.src = item.file;
+                img.alt = item.name;
                 previewContent.appendChild(img);
             } else if (item.mime_type.startsWith('video/')) {
                 const video = document.createElement('video');
                 video.src = item.file;
                 video.controls = true;
+                video.autoplay = true;
                 previewContent.appendChild(video);
             } else if (item.mime_type.startsWith('audio/')) {
                 const audio = document.createElement('audio');
                 audio.src = item.file;
                 audio.controls = true;
+                audio.autoplay = true;
                 previewContent.appendChild(audio);
             } else if (item.mime_type === 'text/plain') {
-                const text = document.createElement('p');
-                text.textContent = item.name;
-                previewContent.appendChild(text);
+                const iframe = document.createElement('iframe');
+                iframe.src = item.file;
+                iframe.style.width = '100%';
+                iframe.style.height = '100%';
+                previewContent.appendChild(iframe);
             }
 
-            previewModal.style.display = 'flex';
+            previewModal.classList.add('active');
         }
 
-        previewModalClose.addEventListener('click', () => {
-            previewModal.style.display = 'none';
+        closePreview.addEventListener('click', () => {
+            previewModal.classList.remove('active');
         });
 
         uploadForm.addEventListener('submit', async (e) => {
@@ -288,7 +281,7 @@
 
                     alert('File uploaded successfully!');
                     uploadForm.reset();
-                    fetchMediaList();
+                    fetchMediaList(); // Refresh media list
                 } catch (error) {
                     console.error('Error uploading file:', error);
                 }
@@ -315,6 +308,7 @@
             displayMediaItems(sortedItems);
         });
 
+        // Load media list on page load
         fetchMediaList();
     </script>
 </body>
