@@ -45,6 +45,9 @@
             max-width: 100%;
             border-radius: 4px;
         }
+        .sort-section {
+            margin-bottom: 1rem;
+        }
     </style>
 </head>
 <body>
@@ -70,6 +73,17 @@
             </form>
         </section>
 
+        <section class="sort-section">
+            <label for="sortCriteria">Sort by:</label>
+            <select id="sortCriteria">
+                <option value="name">Name</option>
+                <option value="size">Size</option>
+                <option value="date">Date</option>
+                <option value="type">Type</option>
+            </select>
+            <button id="sortButton">Sort</button>
+        </section>
+
         <section class="media-list" id="mediaList">
             <!-- Media items will appear here -->
         </section>
@@ -87,6 +101,9 @@
         const OAUTH_TOKEN = 'your_oauth_token_here'; // Replace with your Yandex Disk OAuth token
         const uploadForm = document.getElementById('uploadForm');
         const mediaList = document.getElementById('mediaList');
+        const sortCriteria = document.getElementById('sortCriteria');
+        const sortButton = document.getElementById('sortButton');
+        let mediaItems = [];
 
         async function fetchMediaList() {
             try {
@@ -102,42 +119,45 @@
                 }
 
                 const { items } = await response.json();
-
-                // Display fetched media items
-                mediaList.innerHTML = '';
-                items.forEach(item => {
-                    const mediaItem = document.createElement('div');
-                    mediaItem.classList.add('media-item');
-
-                    if (item.mime_type.startsWith('image/')) {
-                        const img = document.createElement('img');
-                        img.src = item.file;
-                        mediaItem.appendChild(img);
-                    } else if (item.mime_type.startsWith('video/')) {
-                        const video = document.createElement('video');
-                        video.src = item.file;
-                        video.controls = true;
-                        mediaItem.appendChild(video);
-                    } else if (item.mime_type.startsWith('audio/')) {
-                        const audio = document.createElement('audio');
-                        audio.src = item.file;
-                        audio.controls = true;
-                        mediaItem.appendChild(audio);
-                    } else if (item.mime_type === 'text/plain') {
-                        const text = document.createElement('p');
-                        text.textContent = item.name;
-                        mediaItem.appendChild(text);
-                    }
-
-                    const desc = document.createElement('p');
-                    desc.textContent = item.name;
-                    mediaItem.appendChild(desc);
-
-                    mediaList.appendChild(mediaItem);
-                });
+                mediaItems = items;
+                displayMediaItems(items);
             } catch (error) {
                 console.error('Error fetching media list:', error);
             }
+        }
+
+        function displayMediaItems(items) {
+            mediaList.innerHTML = '';
+            items.forEach(item => {
+                const mediaItem = document.createElement('div');
+                mediaItem.classList.add('media-item');
+
+                if (item.mime_type.startsWith('image/')) {
+                    const img = document.createElement('img');
+                    img.src = item.file;
+                    mediaItem.appendChild(img);
+                } else if (item.mime_type.startsWith('video/')) {
+                    const video = document.createElement('video');
+                    video.src = item.file;
+                    video.controls = true;
+                    mediaItem.appendChild(video);
+                } else if (item.mime_type.startsWith('audio/')) {
+                    const audio = document.createElement('audio');
+                    audio.src = item.file;
+                    audio.controls = true;
+                    mediaItem.appendChild(audio);
+                } else if (item.mime_type === 'text/plain') {
+                    const text = document.createElement('p');
+                    text.textContent = item.name;
+                    mediaItem.appendChild(text);
+                }
+
+                const desc = document.createElement('p');
+                desc.textContent = item.name;
+                mediaItem.appendChild(desc);
+
+                mediaList.appendChild(mediaItem);
+            });
         }
 
         uploadForm.addEventListener('submit', async (e) => {
@@ -178,6 +198,26 @@
                     console.error('Error uploading file:', error);
                 }
             }
+        });
+
+        sortButton.addEventListener('click', () => {
+            const criteria = sortCriteria.value;
+            const sortedItems = [...mediaItems];
+
+            sortedItems.sort((a, b) => {
+                if (criteria === 'name') {
+                    return a.name.localeCompare(b.name);
+                } else if (criteria === 'size') {
+                    return (a.size || 0) - (b.size || 0);
+                } else if (criteria === 'date') {
+                    return new Date(a.created) - new Date(b.created);
+                } else if (criteria === 'type') {
+                    return a.mime_type.localeCompare(b.mime_type);
+                }
+                return 0;
+            });
+
+            displayMediaItems(sortedItems);
         });
 
         // Load media list on page load
