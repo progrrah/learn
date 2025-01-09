@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Audio Manager with Yandex Integration</title>
+    <title>Audio Manager</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -51,7 +51,7 @@
 </head>
 <body>
     <header>
-        <h1>Audio Manager with Yandex Integration</h1>
+        <h1>Audio Manager</h1>
         <p>Upload and organize your audio files with enhanced metadata.</p>
     </header>
     <main>
@@ -81,29 +81,56 @@
         const uploadForm = document.getElementById('uploadForm');
         const audioList = document.getElementById('audioList');
         const AUDIO_STORAGE_KEY = 'audioFiles';
-        const ACCESS_TOKEN = 'y0__wgBEImhkZkDGO-hNCDqt_n9Ea0IKBgtCJAfxRzUIbosIgOc7-o6';
+        const YA_TOKEN = 'y0__wgBEImhkZkDGO-hNCDqt_n9Ea0IKBgtCJAfxRzUIbosIgOc7-o6';
 
-        // Load audio items from local storage
-        function loadAudioItems() {
-            const storedAudio = JSON.parse(localStorage.getItem(AUDIO_STORAGE_KEY)) || [];
-            audioList.innerHTML = '';
+        // Load audio items from Yandex Disk
+        async function loadAudioFilesFromYandex() {
+            try {
+                const response = await fetch('https://cloud-api.yandex.net/v1/disk/resources/files', {
+                    headers: {
+                        Authorization: `OAuth ${YA_TOKEN}`,
+                    },
+                });
 
-            storedAudio.forEach(item => {
-                const audioItem = document.createElement('div');
-                audioItem.classList.add('audio-item');
+                if (!response.ok) {
+                    throw new Error('Ошибка при получении файлов из Yandex Disk');
+                }
 
-                const audio = document.createElement('audio');
-                audio.src = item.url;
-                audio.controls = true;
-                audioItem.appendChild(audio);
+                const data = await response.json();
+                const audioFiles = data.items.filter(item => item.mime_type && item.mime_type.startsWith('audio/'));
 
-                const metadata = document.createElement('div');
-                metadata.classList.add('metadata');
-                metadata.innerHTML = `<strong>${item.metadata}</strong>`;
-                audioItem.appendChild(metadata);
+                audioList.innerHTML = ''; // Очистка списка перед загрузкой новых файлов
 
-                audioList.appendChild(audioItem);
-            });
+                for (const file of audioFiles) {
+                    const downloadLinkResponse = await fetch(`https://cloud-api.yandex.net/v1/disk/resources/download?path=${encodeURIComponent(file.path)}`, {
+                        headers: {
+                            Authorization: `OAuth ${YA_TOKEN}`,
+                        },
+                    });
+
+                    if (downloadLinkResponse.ok) {
+                        const downloadLinkData = await downloadLinkResponse.json();
+                        const audioItem = document.createElement('div');
+                        audioItem.classList.add('audio-item');
+
+                        const audio = document.createElement('audio');
+                        audio.src = downloadLinkData.href; // Прямая ссылка для загрузки
+                        audio.controls = true;
+                        audioItem.appendChild(audio);
+
+                        const metadata = document.createElement('div');
+                        metadata.classList.add('metadata');
+                        metadata.innerHTML = `<strong>${file.name}</strong>`;
+                        audioItem.appendChild(metadata);
+
+                        audioList.appendChild(audioItem);
+                    } else {
+                        console.error('Не удалось получить ссылку для загрузки файла:', file.name);
+                    }
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки аудиофайлов:', error);
+            }
         }
 
         // Save audio items to local storage
@@ -111,35 +138,6 @@
             const storedAudio = JSON.parse(localStorage.getItem(AUDIO_STORAGE_KEY)) || [];
             storedAudio.push({ url, metadata });
             localStorage.setItem(AUDIO_STORAGE_KEY, JSON.stringify(storedAudio));
-        }
-
-        // Upload file to Yandex Disk
-        async function uploadToYandexDisk(file, metadata) {
-            const uploadUrlResponse = await fetch('https://cloud-api.yandex.net/v1/disk/resources/upload?path=' + encodeURIComponent(file.name) + '&overwrite=true', {
-                method: 'GET',
-                headers: {
-                    Authorization: `OAuth ${ACCESS_TOKEN}`
-                }
-            });
-
-            if (uploadUrlResponse.ok) {
-                const uploadUrlData = await uploadUrlResponse.json();
-                const uploadResponse = await fetch(uploadUrlData.href, {
-                    method: 'PUT',
-                    body: file
-                });
-
-                if (uploadResponse.ok) {
-                    alert('File uploaded to Yandex Disk successfully!');
-                    const fileUrl = `https://disk.yandex.ru/client/disk/${file.name}`;
-                    saveAudioItem(fileUrl, metadata);
-                    loadAudioItems();
-                } else {
-                    alert('Failed to upload file to Yandex Disk.');
-                }
-            } else {
-                alert('Failed to get upload URL from Yandex Disk.');
-            }
         }
 
         // Handle form submission
@@ -151,16 +149,27 @@
             const file = fileInput.files[0];
 
             if (file) {
-                const metadata = metadataInput.value || 'No metadata provided';
-                uploadToYandexDisk(file, metadata);
-                uploadForm.reset();
+                const reader = new FileReader();
+
+                reader.onload = () => {
+                    const url = reader.result;
+                    const metadata = metadataInput.value || 'No metadata provided';
+
+                    saveAudioItem(url, metadata);
+                    loadAudioFilesFromYandex();
+
+                    uploadForm.reset();
+                    alert('Audio uploaded successfully!');
+                };
+
+                reader.readAsDataURL(file);
             } else {
                 alert('Please select a file to upload.');
             }
         });
 
         // Load audio items on page load
-        loadAudioItems();
+        loadAudioFilesFromYandex();
     </script>
 </body>
 </html>
