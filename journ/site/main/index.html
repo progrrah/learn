@@ -27,8 +27,15 @@
             }
         )
         .then(({handler}) => handler())
-        .then(data => console.log('Сообщение с токеном', data))
-        .catch(error => console.log('Обработка ошибки', error))
+        .then(data => {
+            console.log('Сообщение с токеном', data);
+            localStorage.setItem('oauthToken', data.access_token);
+            window.location.href = 'main.html'; // Redirect to main interface after authentication
+        })
+        .catch(error => {
+            console.error('Обработка ошибки', error);
+            alert('Authentication failed. Please try again.');
+        });
     </script>
 </body>
 </html>
