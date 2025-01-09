@@ -40,13 +40,63 @@
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             width: calc(33.333% - 1rem);
             box-sizing: border-box;
+            position: relative;
         }
         .media-item img, .media-item video, .media-item audio {
             max-width: 100%;
             border-radius: 4px;
+            margin-bottom: 0.5rem;
+        }
+        .media-item .preview-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #6200ea;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 0.5rem;
+            cursor: pointer;
+        }
+        .media-item .preview-button:hover {
+            background: #3700b3;
         }
         .sort-section {
             margin-bottom: 1rem;
+        }
+        #previewModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        #previewModalContent {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            max-width: 90%;
+            max-height: 90%;
+            overflow: auto;
+        }
+        #previewModalClose {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #6200ea;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 0.5rem;
+            cursor: pointer;
+        }
+        #previewModalClose:hover {
+            background: #3700b3;
         }
     </style>
 </head>
@@ -89,8 +139,14 @@
         </section>
     </main>
 
+    <div id="previewModal">
+        <div id="previewModalContent">
+            <button id="previewModalClose">Close</button>
+            <div id="previewContent"></div>
+        </div>
+    </div>
+
     <script>
-        // Check user authentication
         const user = JSON.parse(localStorage.getItem('user'));
         if (!user) {
             alert('Please register first!');
@@ -98,12 +154,16 @@
         }
 
         const YANDEX_DISK_API_URL = 'https://cloud-api.yandex.net/v1/disk/resources';
-        const OAUTH_TOKEN = 'y0__wgBEImhkZkDGNGhNCDC-OL9EUk1L947SmaybN0F3_ooOmB2Dn6N'; // Replace with your Yandex Disk OAuth token
+        const OAUTH_TOKEN = 'y0__wgBEImhkZkDGNGhNCDC-OL9EUk1L947SmaybN0F3_ooOmB2Dn6N';
         const uploadForm = document.getElementById('uploadForm');
         const mediaList = document.getElementById('mediaList');
         const sortCriteria = document.getElementById('sortCriteria');
         const sortButton = document.getElementById('sortButton');
-        let mediaItems = JSON.parse(localStorage.getItem('mediaItems')) || [];
+        const previewModal = document.getElementById('previewModal');
+        const previewContent = document.getElementById('previewContent');
+        const previewModalClose = document.getElementById('previewModalClose');
+
+        let mediaItems = [];
 
         async function fetchMediaList() {
             try {
@@ -120,7 +180,6 @@
 
                 const { items } = await response.json();
                 mediaItems = items;
-                localStorage.setItem('mediaItems', JSON.stringify(items));
                 displayMediaItems(items);
             } catch (error) {
                 console.error('Error fetching media list:', error);
@@ -157,9 +216,44 @@
                 desc.textContent = item.name;
                 mediaItem.appendChild(desc);
 
+                const previewButton = document.createElement('button');
+                previewButton.textContent = 'Preview';
+                previewButton.classList.add('preview-button');
+                previewButton.addEventListener('click', () => openPreview(item));
+                mediaItem.appendChild(previewButton);
+
                 mediaList.appendChild(mediaItem);
             });
         }
+
+        function openPreview(item) {
+            previewContent.innerHTML = '';
+            if (item.mime_type.startsWith('image/')) {
+                const img = document.createElement('img');
+                img.src = item.file;
+                previewContent.appendChild(img);
+            } else if (item.mime_type.startsWith('video/')) {
+                const video = document.createElement('video');
+                video.src = item.file;
+                video.controls = true;
+                previewContent.appendChild(video);
+            } else if (item.mime_type.startsWith('audio/')) {
+                const audio = document.createElement('audio');
+                audio.src = item.file;
+                audio.controls = true;
+                previewContent.appendChild(audio);
+            } else if (item.mime_type === 'text/plain') {
+                const text = document.createElement('p');
+                text.textContent = item.name;
+                previewContent.appendChild(text);
+            }
+
+            previewModal.style.display = 'flex';
+        }
+
+        previewModalClose.addEventListener('click', () => {
+            previewModal.style.display = 'none';
+        });
 
         uploadForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -194,7 +288,7 @@
 
                     alert('File uploaded successfully!');
                     uploadForm.reset();
-                    fetchMediaList(); // Refresh media list
+                    fetchMediaList();
                 } catch (error) {
                     console.error('Error uploading file:', error);
                 }
@@ -221,12 +315,7 @@
             displayMediaItems(sortedItems);
         });
 
-        // Load media list from localStorage on page load
-        if (mediaItems.length > 0) {
-            displayMediaItems(mediaItems);
-        } else {
-            fetchMediaList();
-        }
+        fetchMediaList();
     </script>
 </body>
 </html>
