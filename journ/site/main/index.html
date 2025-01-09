@@ -62,19 +62,26 @@
         </section>
     </main>
     <script>
-        const registrationForm = document.getElementById('registrationForm');
-        registrationForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-
-            // Simple user data simulation
-            localStorage.setItem('user', JSON.stringify({ username, password }));
-
-            // Redirect to main interface
-            window.location.href = 'main.html';
-        });
-    </script>
+    window.YaAuthSuggest.init(
+        {
+          client_id: "435b347e4d4544c38341d54592f42553",
+          response_type: "token",
+          redirect_uri: "https://oauth.yandex.ru/verification_code"
+        },
+        "https://oauth.yandex.ru",
+        {
+          view: "button",
+          parentId: "buttonContainerId",
+          buttonSize: 'm',
+          buttonView: 'main',
+          buttonTheme: 'light',
+          buttonBorderRadius: "0",
+          buttonIcon: 'ya',
+        }
+    )
+    .then(({handler}) => handler())
+    .then(data => console.log('Сообщение с токеном', data))
+    .catch(error => console.log('Обработка ошибки', error))
+</script>
 </body>
 </html>
