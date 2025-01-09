@@ -80,7 +80,6 @@
     <script>
         const uploadForm = document.getElementById('uploadForm');
         const audioList = document.getElementById('audioList');
-        const AUDIO_STORAGE_KEY = 'audioFiles';
         const YA_TOKEN = 'y0__wgBEImhkZkDGO-hNCDqt_n9Ea0IKBgtCJAfxRzUIbosIgOc7-o6';
 
         // Load audio items from Yandex Disk
@@ -133,11 +132,34 @@
             }
         }
 
-        // Save audio items to local storage
-        function saveAudioItem(url, metadata) {
-            const storedAudio = JSON.parse(localStorage.getItem(AUDIO_STORAGE_KEY)) || [];
-            storedAudio.push({ url, metadata });
-            localStorage.setItem(AUDIO_STORAGE_KEY, JSON.stringify(storedAudio));
+        // Upload audio file to Yandex Disk
+        async function uploadAudioToYandex(file, metadata) {
+            try {
+                const uploadLinkResponse = await fetch(`https://cloud-api.yandex.net/v1/disk/resources/upload?path=${encodeURIComponent(file.name)}&overwrite=true`, {
+                    headers: {
+                        Authorization: `OAuth ${YA_TOKEN}`,
+                    },
+                });
+
+                if (!uploadLinkResponse.ok) {
+                    throw new Error('Ошибка получения ссылки для загрузки файла');
+                }
+
+                const uploadLinkData = await uploadLinkResponse.json();
+                const uploadResponse = await fetch(uploadLinkData.href, {
+                    method: 'PUT',
+                    body: file,
+                });
+
+                if (!uploadResponse.ok) {
+                    throw new Error('Ошибка при загрузке файла в Yandex Disk');
+                }
+
+                alert('Файл успешно загружен!');
+                loadAudioFilesFromYandex();
+            } catch (error) {
+                console.error('Ошибка загрузки файла:', error);
+            }
         }
 
         // Handle form submission
@@ -149,22 +171,10 @@
             const file = fileInput.files[0];
 
             if (file) {
-                const reader = new FileReader();
-
-                reader.onload = () => {
-                    const url = reader.result;
-                    const metadata = metadataInput.value || 'No metadata provided';
-
-                    saveAudioItem(url, metadata);
-                    loadAudioFilesFromYandex();
-
-                    uploadForm.reset();
-                    alert('Audio uploaded successfully!');
-                };
-
-                reader.readAsDataURL(file);
+                uploadAudioToYandex(file, metadataInput.value);
+                uploadForm.reset();
             } else {
-                alert('Please select a file to upload.');
+                alert('Пожалуйста, выберите файл для загрузки.');
             }
         });
 
