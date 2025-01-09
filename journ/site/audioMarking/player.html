@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Audio Manager with Proxy</title>
+    <title>Audio Manager</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -80,25 +80,33 @@
     <script>
         const uploadForm = document.getElementById('uploadForm');
         const audioList = document.getElementById('audioList');
-        const proxyUrl = "http://localhost:8080/proxy";
-        const yandexApiUrl = "https://cloud-api.yandex.net/v1/disk/resources/files";
+        const PROXY_BASE_URL = 'http://localhost:3000/proxy';
+        const YA_TOKEN = 'y0__wgBEImhkZkDGO-hNCDqt_n9Ea0IKBgtCJAfxRzUIbosIgOc7-o6';
 
-        // Load audio items from Yandex Disk via proxy
+        // Load audio items from Yandex Disk
         async function loadAudioFilesFromYandex() {
             try {
-                const response = await fetch(`${proxyUrl}?url=${encodeURIComponent(yandexApiUrl)}`);
+                const response = await fetch(`${PROXY_BASE_URL}/v1/disk/resources/files`, {
+                    headers: {
+                        Authorization: `OAuth ${YA_TOKEN}`,
+                    },
+                });
 
                 if (!response.ok) {
-                    throw new Error('Failed to fetch files from Yandex Disk');
+                    throw new Error('Failed to fetch audio files from Yandex Disk');
                 }
 
                 const data = await response.json();
                 const audioFiles = data.items.filter(item => item.mime_type && item.mime_type.startsWith('audio/'));
 
-                audioList.innerHTML = ''; // Clear the list before adding new files
+                audioList.innerHTML = ''; // Clear existing list
 
                 for (const file of audioFiles) {
-                    const downloadLinkResponse = await fetch(`${proxyUrl}?url=${encodeURIComponent(file.file)}`);
+                    const downloadLinkResponse = await fetch(`${PROXY_BASE_URL}/v1/disk/resources/download?path=${encodeURIComponent(file.path)}`, {
+                        headers: {
+                            Authorization: `OAuth ${YA_TOKEN}`,
+                        },
+                    });
 
                     if (downloadLinkResponse.ok) {
                         const downloadLinkData = await downloadLinkResponse.json();
@@ -106,7 +114,7 @@
                         audioItem.classList.add('audio-item');
 
                         const audio = document.createElement('audio');
-                        audio.src = downloadLinkData.href; // Direct link to the file
+                        audio.src = downloadLinkData.href; // Direct download link
                         audio.controls = true;
                         audioItem.appendChild(audio);
 
@@ -117,7 +125,7 @@
 
                         audioList.appendChild(audioItem);
                     } else {
-                        console.error('Failed to get download link for file:', file.name);
+                        console.error('Failed to get download link for:', file.name);
                     }
                 }
             } catch (error) {
@@ -126,28 +134,41 @@
         }
 
         // Handle form submission
-        uploadForm.addEventListener('submit', event => {
+        uploadForm.addEventListener('submit', async event => {
             event.preventDefault();
 
             const fileInput = document.getElementById('audioInput');
             const metadataInput = document.getElementById('metadata');
             const file = fileInput.files[0];
 
-            if (file) {
-                const reader = new FileReader();
-
-                reader.onload = () => {
-                    const url = reader.result;
-                    const metadata = metadataInput.value || 'No metadata provided';
-
-                    // Simulate saving to Yandex Disk via Proxy
-                    console.log('Uploading file to Yandex Disk...');
-                    alert('File uploaded successfully!');
-                };
-
-                reader.readAsDataURL(file);
-            } else {
+            if (!file) {
                 alert('Please select a file to upload.');
+                return;
+            }
+
+            try {
+                // Create form data for the upload
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('path', `disk:/audio/${file.name}`);
+
+                const response = await fetch(`${PROXY_BASE_URL}/v1/disk/resources/upload`, {
+                    method: 'POST',
+                    headers: {
+                        Authorization: `OAuth ${YA_TOKEN}`,
+                    },
+                    body: formData,
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to upload audio file');
+                }
+
+                alert('Audio uploaded successfully!');
+                loadAudioFilesFromYandex();
+            } catch (error) {
+                console.error('Error uploading audio file:', error);
+                alert('Failed to upload the file. Check the console for more details.');
             }
         });
 
