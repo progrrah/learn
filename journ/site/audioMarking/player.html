@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Audio Manager</title>
+    <title>Audio Manager with Yandex Integration</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -51,7 +51,7 @@
 </head>
 <body>
     <header>
-        <h1>Audio Manager</h1>
+        <h1>Audio Manager with Yandex Integration</h1>
         <p>Upload and organize your audio files with enhanced metadata.</p>
     </header>
     <main>
@@ -81,7 +81,7 @@
         const uploadForm = document.getElementById('uploadForm');
         const audioList = document.getElementById('audioList');
         const AUDIO_STORAGE_KEY = 'audioFiles';
-        const YANDEX_DISK_TOKEN = 'y0__wgBEImhkZkDGNGhNCDC-OL9EUk1L947SmaybN0F3_ooOmB2Dn6N';
+        const ACCESS_TOKEN = 'y0__wgBEImhkZkDGO-hNCDqt_n9Ea0IKBgtCJAfxRzUIbosIgOc7-o6';
 
         // Load audio items from local storage
         function loadAudioItems() {
@@ -114,38 +114,36 @@
         }
 
         // Upload file to Yandex Disk
-        async function uploadToYandexDisk(file, fileName) {
-            const uploadUrl = `https://cloud-api.yandex.net/v1/disk/resources/upload?path=${encodeURIComponent(fileName)}&overwrite=true`;
-
-            // Step 1: Get upload link
-            const response = await fetch(uploadUrl, {
+        async function uploadToYandexDisk(file, metadata) {
+            const uploadUrlResponse = await fetch('https://cloud-api.yandex.net/v1/disk/resources/upload?path=' + encodeURIComponent(file.name) + '&overwrite=true', {
                 method: 'GET',
                 headers: {
-                    'Authorization': `OAuth ${YANDEX_DISK_TOKEN}`
+                    Authorization: `OAuth ${ACCESS_TOKEN}`
                 }
             });
 
-            if (!response.ok) {
-                throw new Error('Failed to get upload URL');
+            if (uploadUrlResponse.ok) {
+                const uploadUrlData = await uploadUrlResponse.json();
+                const uploadResponse = await fetch(uploadUrlData.href, {
+                    method: 'PUT',
+                    body: file
+                });
+
+                if (uploadResponse.ok) {
+                    alert('File uploaded to Yandex Disk successfully!');
+                    const fileUrl = `https://disk.yandex.ru/client/disk/${file.name}`;
+                    saveAudioItem(fileUrl, metadata);
+                    loadAudioItems();
+                } else {
+                    alert('Failed to upload file to Yandex Disk.');
+                }
+            } else {
+                alert('Failed to get upload URL from Yandex Disk.');
             }
-
-            const data = await response.json();
-
-            // Step 2: Upload file to the provided link
-            const uploadResponse = await fetch(data.href, {
-                method: 'PUT',
-                body: file
-            });
-
-            if (!uploadResponse.ok) {
-                throw new Error('Failed to upload file to Yandex Disk');
-            }
-
-            alert('File uploaded to Yandex Disk successfully!');
         }
 
         // Handle form submission
-        uploadForm.addEventListener('submit', async event => {
+        uploadForm.addEventListener('submit', event => {
             event.preventDefault();
 
             const fileInput = document.getElementById('audioInput');
@@ -153,29 +151,9 @@
             const file = fileInput.files[0];
 
             if (file) {
-                try {
-                    const reader = new FileReader();
-
-                    reader.onload = async () => {
-                        const url = reader.result;
-                        const metadata = metadataInput.value || 'No metadata provided';
-
-                        // Save locally
-                        saveAudioItem(url, metadata);
-
-                        // Save to Yandex Disk
-                        await uploadToYandexDisk(file, file.name);
-
-                        // Refresh UI
-                        loadAudioItems();
-                        uploadForm.reset();
-                    };
-
-                    reader.readAsDataURL(file);
-                } catch (error) {
-                    console.error('Error uploading file:', error);
-                    alert('Failed to upload file. Please try again.');
-                }
+                const metadata = metadataInput.value || 'No metadata provided';
+                uploadToYandexDisk(file, metadata);
+                uploadForm.reset();
             } else {
                 alert('Please select a file to upload.');
             }
