@@ -85,6 +85,7 @@
         // Load audio items from Yandex Disk
         async function loadAudioFilesFromYandex() {
             try {
+                console.log('Fetching audio files from Yandex Disk...');
                 const response = await fetch('https://cloud-api.yandex.net/v1/disk/resources/files', {
                     headers: {
                         Authorization: `OAuth ${YA_TOKEN}`,
@@ -92,15 +93,19 @@
                 });
 
                 if (!response.ok) {
-                    throw new Error('Ошибка при получении файлов из Yandex Disk');
+                    throw new Error(`Error fetching files: ${response.statusText}`);
                 }
 
                 const data = await response.json();
+                console.log('Fetched files:', data);
+
                 const audioFiles = data.items.filter(item => item.mime_type && item.mime_type.startsWith('audio/'));
 
-                audioList.innerHTML = ''; // Очистка списка перед загрузкой новых файлов
+                audioList.innerHTML = ''; // Clear the list before loading new files
 
                 for (const file of audioFiles) {
+                    console.log(`Processing file: ${file.name}`);
+
                     const downloadLinkResponse = await fetch(`https://cloud-api.yandex.net/v1/disk/resources/download?path=${encodeURIComponent(file.path)}`, {
                         headers: {
                             Authorization: `OAuth ${YA_TOKEN}`,
@@ -109,11 +114,13 @@
 
                     if (downloadLinkResponse.ok) {
                         const downloadLinkData = await downloadLinkResponse.json();
+                        console.log('Download link data:', downloadLinkData);
+
                         const audioItem = document.createElement('div');
                         audioItem.classList.add('audio-item');
 
                         const audio = document.createElement('audio');
-                        audio.src = downloadLinkData.href; // Прямая ссылка для загрузки
+                        audio.src = downloadLinkData.href; // Direct download link
                         audio.controls = true;
                         audioItem.appendChild(audio);
 
@@ -124,46 +131,16 @@
 
                         audioList.appendChild(audioItem);
                     } else {
-                        console.error('Не удалось получить ссылку для загрузки файла:', file.name);
+                        console.error(`Failed to get download link for file: ${file.name}`);
                     }
                 }
             } catch (error) {
-                console.error('Ошибка загрузки аудиофайлов:', error);
-            }
-        }
-
-        // Upload audio file to Yandex Disk
-        async function uploadAudioToYandex(file, metadata) {
-            try {
-                const uploadLinkResponse = await fetch(`https://cloud-api.yandex.net/v1/disk/resources/upload?path=${encodeURIComponent(file.name)}&overwrite=true`, {
-                    headers: {
-                        Authorization: `OAuth ${YA_TOKEN}`,
-                    },
-                });
-
-                if (!uploadLinkResponse.ok) {
-                    throw new Error('Ошибка получения ссылки для загрузки файла');
-                }
-
-                const uploadLinkData = await uploadLinkResponse.json();
-                const uploadResponse = await fetch(uploadLinkData.href, {
-                    method: 'PUT',
-                    body: file,
-                });
-
-                if (!uploadResponse.ok) {
-                    throw new Error('Ошибка при загрузке файла в Yandex Disk');
-                }
-
-                alert('Файл успешно загружен!');
-                loadAudioFilesFromYandex();
-            } catch (error) {
-                console.error('Ошибка загрузки файла:', error);
+                console.error('Error loading audio files:', error);
             }
         }
 
         // Handle form submission
-        uploadForm.addEventListener('submit', event => {
+        uploadForm.addEventListener('submit', async event => {
             event.preventDefault();
 
             const fileInput = document.getElementById('audioInput');
@@ -171,10 +148,34 @@
             const file = fileInput.files[0];
 
             if (file) {
-                uploadAudioToYandex(file, metadataInput.value);
-                uploadForm.reset();
+                try {
+                    console.log(`Uploading file: ${file.name}`);
+
+                    const uploadResponse = await fetch(`https://cloud-api.yandex.net/v1/disk/resources/upload?path=${encodeURIComponent(`/audio/${file.name}`)}&overwrite=true`, {
+                        headers: {
+                            Authorization: `OAuth ${YA_TOKEN}`,
+                        },
+                    });
+
+                    if (!uploadResponse.ok) {
+                        throw new Error(`Error getting upload URL: ${uploadResponse.statusText}`);
+                    }
+
+                    const uploadData = await uploadResponse.json();
+                    console.log('Upload URL:', uploadData);
+
+                    await fetch(uploadData.href, {
+                        method: 'PUT',
+                        body: file,
+                    });
+
+                    console.log('File uploaded successfully.');
+                    loadAudioFilesFromYandex();
+                } catch (error) {
+                    console.error('Error uploading file:', error);
+                }
             } else {
-                alert('Пожалуйста, выберите файл для загрузки.');
+                alert('Please select a file to upload.');
             }
         });
 
