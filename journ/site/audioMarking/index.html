@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music App - Авторизация</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 2rem;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Добро пожаловать в Music App</h1>
+    <p>Войдите через Yandex, чтобы получить доступ к своему облаку</p>
+    <div id="buttonContainer"></div>
+
+    <script src="https://yastatic.net/s3/passport-sdk/autofill/v1/sdk-suggest-with-polyfills-latest.js"></script>
+    <script>
+        // Инициализация кнопки авторизации
+        window.YaAuthSuggest.init(
+            {
+                client_id: "2ed2b3602e9f46b7b4e9d7d4c089ce2c",
+                response_type: "token",
+                redirect_uri: "https://progrrah.github.io/learn/journ/site/audioMarking/player.html"
+            },
+            "https://oauth.yandex.ru",
+            {
+                view: "button",
+                parentId: "buttonContainer"
+            }
+        )
+        .then(({ handler }) => handler())
+        .then(data => console.log('Токен авторизации:', data))
+        .catch(error => console.log('Ошибка авторизации:', error));
+    </script>
+</body>
+</html>
