@@ -103,7 +103,7 @@
         const mediaList = document.getElementById('mediaList');
         const sortCriteria = document.getElementById('sortCriteria');
         const sortButton = document.getElementById('sortButton');
-        let mediaItems = [];
+        let mediaItems = JSON.parse(localStorage.getItem('mediaItems')) || [];
 
         async function fetchMediaList() {
             try {
@@ -120,6 +120,7 @@
 
                 const { items } = await response.json();
                 mediaItems = items;
+                localStorage.setItem('mediaItems', JSON.stringify(items));
                 displayMediaItems(items);
             } catch (error) {
                 console.error('Error fetching media list:', error);
@@ -220,8 +221,12 @@
             displayMediaItems(sortedItems);
         });
 
-        // Load media list on page load
-        fetchMediaList();
+        // Load media list from localStorage on page load
+        if (mediaItems.length > 0) {
+            displayMediaItems(mediaItems);
+        } else {
+            fetchMediaList();
+        }
     </script>
 </body>
 </html>
