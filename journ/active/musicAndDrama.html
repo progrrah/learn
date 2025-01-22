@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>&rcy;&iecy;&scy;&ucy;&rcy;&scy;&ycy; &dcy;&lcy;&yacy; &gcy;&lcy;&ucy;&bcy;&ocy;&kcy;&ocy;&gcy;&ocy; &pcy;&ocy;&ncy;&icy;&mcy;&acy;&ncy;&icy;&yacy; &mcy;&ucy;&zcy;&ycy;&kcy;&icy;&comma; &mcy;&ucy;&zcy;&ycy;&kcy;&acy;&ncy;&tcy;&acy;</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+/* From extension marp-team.marp-vscode */
+#__marp-vscode {
+  all: revert;
+}
+
+/* Override VS Code default CSS rules reverting to initial
+   https://github.com/microsoft/vscode/blob/master/src/vs/workbench/contrib/webview/browser/pre/main.js#L53 */
+body.marp-vscode {
+  padding: 0;
+}
+
+body.marp-vscode img {
+  max-width: unset;
+  max-height: unset;
+}
+
+body.marp-vscode a,
+body.marp-vscode a:hover,
+body.marp-vscode code {
+  color: unset;
+}
+
+body.marp-vscode blockquote {
+  background: unset;
+  border-color: unset;
+}
+
+@media screen {
+  body.marp-vscode {
+    overflow-y: scroll;
+  }
+
+  #__marp-vscode [data-marp-vscode-slide-wrapper] {
+    margin: 20px;
+  }
+
+  #__marp-vscode svg[data-marpit-svg] {
+    box-shadow: 0 5px 10px rgb(0 0 0 / 25%);
+    display: block;
+    margin: 0;
+  }
+
+  /* Based on https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+  #code-csp-warning {
+    background-color: #444;
+    box-shadow: 1px 1px 1px rgb(0 0 0 / 25%);
+    color: white;
+    cursor: pointer;
+    font-family: sans-serif;
+    font-size: 12px;
+    line-height: 22px;
+    margin: 16px;
+    padding: 6px;
+    position: fixed;
+    right: 0;
+    text-align: center;
+    top: 0;
+    word-wrap: break-word;
+  }
+
+  #code-csp-warning:hover {
+    text-decoration: none;
+    background-color: #007acc;
+    box-shadow: 2px 2px 2px rgb(0 0 0 / 25%);
+  }
+}
+
+@media print {
+  body.marp-vscode #code-csp-warning {
+    display: none;
+  }
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: Courier New;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="ресурсы-для-глубокого-понимания-музыки-музыканта">ресурсы для глубокого понимания музыки, музыканта</h1>
+<h2 id="художественные-произведения">художественные произведения</h2>
+<p>Музыка как искусство часто становится центральной темой художественной литературы, поскольку она позволяет писателям исследовать человеческие эмоции, страсти, стремления и взаимодействие искусства с жизнью. Ниже перечислены художественные произведения, которые глубоко раскрывают сущность музыки и музыкантов:</p>
+<hr>
+<h3 id="1-томас-манн--доктор-фаустус-1947">1. <strong>Томас Манн – «Доктор Фаустус» (1947)</strong></h3>
+<ul>
+<li><strong>О чём:</strong> История композитора Адриана Леверкюна, который заключает сделку с дьяволом в обмен на творческий гений. Роман исследует связи между музыкой, гениальностью и моральной деградацией.</li>
+<li><strong>Как раскрывает сущность музыки:</strong> Манн мастерски передаёт сложность музыкального творчества, его философские и духовные аспекты. Автор подробно описывает музыкальные формы и идеи, вплетая их в сюжет.</li>
+</ul>
+<hr>
+<h3 id="2-энтони-бёрджесс--автоматический-апельсин-1962">2. <strong>Энтони Бёрджесс – «Автоматический апельсин» (1962)</strong></h3>
+<ul>
+<li><strong>О чём:</strong> Роман о насилии, свободе воли и обществе. Главный герой Алекс — любитель классической музыки, особенно Бетховена.</li>
+<li><strong>Как раскрывает сущность музыки:</strong> Музыка здесь символизирует как высшую красоту, так и источник мощных, разрушительных эмоций. Она становится ключом к пониманию внутреннего мира Алекса.</li>
+</ul>
+<hr>
+<h3 id="3-марсель-пруст--в-поисках-утраченного-времени-19131927">3. <strong>Марсель Пруст – «В поисках утраченного времени» (1913–1927)</strong></h3>
+<ul>
+<li><strong>О чём:</strong> Эпопея о памяти, времени и искусстве.</li>
+<li><strong>Как раскрывает сущность музыки:</strong> В романе значительное место занимает вымышленная музыкальная тема Вентейля, которая становится символом памяти и силы искусства. Музыка в произведении Пруста объединяет время, воспоминания и эстетическое переживание.</li>
+</ul>
+<hr>
+<h3 id="4-э-м-форстер--говардс-энд-1910">4. <strong>Э. М. Форстер – «Говардс-Энд» (1910)</strong></h3>
+<ul>
+<li><strong>О чём:</strong> Роман о человеческих связях, социальных различиях и искусстве.</li>
+<li><strong>Как раскрывает сущность музыки:</strong> Музыка в романе олицетворяет возможность соединения разных мировоззрений и эмоциональных состояний. Особенно важны сцены, где герои слушают Бетховена, отражая своё восприятие через его музыку.</li>
+</ul>
+<hr>
+<h3 id="5-вирджиния-вулф--орландо-1928">5. <strong>Вирджиния Вулф – «Орландо» (1928)</strong></h3>
+<ul>
+<li><strong>О чём:</strong> Фантазийный роман о поэте, который проживает несколько веков, меняя пол.</li>
+<li><strong>Как раскрывает сущность музыки:</strong> Вулф использует музыку как метафору изменчивости времени, эмоций и самовыражения.</li>
+</ul>
+<hr>
+<h3 id="6-казуо-исигуро--ноктюрны-пять-историй-о-музыке-и-сумерках-2009">6. <strong>Казуо Исигуро – «Ноктюрны: пять историй о музыке и сумерках» (2009)</strong></h3>
+<ul>
+<li><strong>О чём:</strong> Сборник рассказов, где главной темой становится музыка и её влияние на человеческие отношения.</li>
+<li><strong>Как раскрывает сущность музыки:</strong> Каждый рассказ показывает музыку как источник вдохновения, утешения или конфликта, исследуя её влияние на жизнь героев.</li>
+</ul>
+<hr>
+<h3 id="7-анна-энквист--скрипач-1994">7. <strong>Анна Энквист – «Скрипач» (1994)</strong></h3>
+<ul>
+<li><strong>О чём:</strong> История скрипачки, которая теряет своего ребёнка и пытается справиться с горем через музыку.</li>
+<li><strong>Как раскрывает сущность музыки:</strong> Роман показывает музыку как способ эмоционального выражения и выживания, исследуя её терапевтическую силу.</li>
+</ul>
+<hr>
+<h3 id="8-патрик-зюскинд--контрабас-1981">8. <strong>Патрик Зюскинд – «Контрабас» (1981)</strong></h3>
+<ul>
+<li><strong>О чём:</strong> Монолог контрабасиста, который размышляет о своей жизни, любви и искусстве.</li>
+<li><strong>Как раскрывает сущность музыки:</strong> Зюскинд раскрывает жизнь музыканта, находящегося в тени оркестра, и показывает сложные отношения между музыкантом и его инструментом.</li>
+</ul>
+<hr>
+<h3 id="9-борис-пастернак--доктор-живаго-1957">9. <strong>Борис Пастернак – «Доктор Живаго» (1957)</strong></h3>
+<ul>
+<li><strong>О чём:</strong> История любви, революции и искусства.</li>
+<li><strong>Как раскрывает сущность музыки:</strong> Герои романа воспринимают музыку как отражение своих эмоций. Музыкальные образы переплетаются с поэзией, усиливая связь между искусствами.</li>
+</ul>
+<hr>
+<h3 id="10-алессандро-барикко--шёлк-1996">10. <strong>Алессандро Барикко – «Шёлк» (1996)</strong></h3>
+<ul>
+<li><strong>О чём:</strong> Лирическая история о любви и путешествиях.</li>
+<li><strong>Как раскрывает сущность музыки:</strong> В романе музыка играет роль тихого фона, способного выразить тончайшие оттенки эмоций героев.</li>
+</ul>
+<hr>
+<h3 id="11-джеймс-болдуин--блюз-для-мистера-чарли-1964">11. <strong>Джеймс Болдуин – «Блюз для мистера Чарли» (1964)</strong></h3>
+<ul>
+<li><strong>О чём:</strong> Пьеса о расовых конфликтах в США.</li>
+<li><strong>Как раскрывает сущность музыки:</strong> Музыка, особенно джаз и блюз, становится голосом угнетённой общины и символом борьбы, надежды и идентичности.</li>
+</ul>
+<hr>
+<h3 id="итог">Итог</h3>
+<p>Эти произведения раскрывают сущность музыки через разные аспекты — как источник вдохновения, средство самовыражения, символ человеческих переживаний и даже инструмент разрушения или исцеления. Они погружают читателя в мир звуков и показывают, как искусство музыки переплетается с человеческой жизнью.</p>
+<h2 id="публицистика">публицистика</h2>
+<p>Публицистические работы, посвящённые музыке и музыкантам, предлагают глубокий анализ природы музыки, её влияния на человека, а также особенности творчества выдающихся исполнителей и композиторов. Вот список известных и ценных публицистических трудов, которые раскрывают сущность музыки и её творцов:</p>
+<hr>
+<h3 id="1-алексей-лосев--музыка-как-предмет-логики-1927">1. <strong>Алексей Лосев – «Музыка как предмет логики» (1927)</strong></h3>
+<ul>
+<li><strong>О чём:</strong> Лосев рассматривает музыку с философской точки зрения, пытаясь объяснить её метафизическую природу и связь с человеческим сознанием.</li>
+<li><strong>Почему важно:</strong> Работа раскрывает глубокие идеи о том, как музыка воздействует на эмоции, оставаясь абстрактной формой искусства.</li>
+</ul>
+<hr>
+<h3 id="2-роман-роллан--жизнь-бетховена-1903">2. <strong>Роман Роллан – «Жизнь Бетховена» (1903)</strong></h3>
+<ul>
+<li><strong>О чём:</strong> Биографическая работа о Людвиге ван Бетховене, которая исследует его личность, творчество и борьбу с жизненными трудностями.</li>
+<li><strong>Почему важно:</strong> Роллан показывает, как музыка Бетховена связана с его страданиями и мировоззрением, превращая его в символ человеческой стойкости.</li>
+</ul>
+<hr>
+<h3 id="3-томас-манн--страдания-и-величие-рихарда-вагнера-1933">3. <strong>Томас Манн – «Страдания и величие Рихарда Вагнера» (1933)</strong></h3>
+<ul>
+<li><strong>О чём:</strong> Очерк, посвящённый фигуре Рихарда Вагнера, его музыке и сложным отношениям с миром.</li>
+<li><strong>Почему важно:</strong> Манн анализирует музыку Вагнера как выражение немецкого духа и исследует её влияние на культуру и политику.</li>
+</ul>
+<hr>
+<h3 id="4-игорь-стравинский--музыкальная-поэтика-1942">4. <strong>Игорь Стравинский – «Музыкальная поэтика» (1942)</strong></h3>
+<ul>
+<li><strong>О чём:</strong> Серия лекций композитора о сущности музыки, её роли в обществе и процессе создания произведений.</li>
+<li><strong>Почему важно:</strong> Стравинский делится своими взглядами на музыку как на структуру, подчёркивая значение формы и дисциплины в творчестве.</li>
+</ul>
+<hr>
+<h3 id="5-фёдор-шаляпин--страницы-из-моей-жизни-1917">5. <strong>Фёдор Шаляпин – «Страницы из моей жизни» (1917)</strong></h3>
+<ul>
+<li><strong>О чём:</strong> Автобиография знаменитого русского оперного певца, рассказывающая о его пути к славе и взаимоотношениях с музыкой.</li>
+<li><strong>Почему важно:</strong> Шаляпин показывает, как личный опыт и эмоциональная глубина влияют на музыкальное исполнение.</li>
+</ul>
+<hr>
+<h3 id="6-борис-асафьев--музыкальная-форма-как-процесс-1930">6. <strong>Борис Асафьев – «Музыкальная форма как процесс» (1930)</strong></h3>
+<ul>
+<li><strong>О чём:</strong> Фундаментальный труд о природе музыкальной формы, её динамике и взаимодействии с восприятием.</li>
+<li><strong>Почему важно:</strong> Асафьев предлагает революционный подход к пониманию музыки как процесса, а не статичной структуры.</li>
+</ul>
+<hr>
+<h3 id="7-андрей-белый--символизм-и-музыка-1910">7. <strong>Андрей Белый – «Символизм и музыка» (1910)</strong></h3>
+<ul>
+<li><strong>О чём:</strong> Анализ взаимосвязи музыки и символизма как художественного направления.</li>
+<li><strong>Почему важно:</strong> Работа помогает понять, как музыка выражает недосказанное и невыразимое через ассоциации и метафоры.</li>
+</ul>
+<hr>
+<h3 id="8-оливер-сакс--музыкофилия-2007">8. <strong>Оливер Сакс – «Музыкофилия» (2007)</strong></h3>
+<ul>
+<li><strong>О чём:</strong> Исследование нейропсихолога, который изучает, как музыка влияет на человеческий мозг и поведение.</li>
+<li><strong>Почему важно:</strong> Книга раскрывает научную сторону взаимодействия музыки и человеческой психики, включая её терапевтические свойства.</li>
+</ul>
+<hr>
+<h3 id="9-владимир-мартынов--конец-времени-композиторов-2002">9. <strong>Владимир Мартынов – «Конец времени композиторов» (2002)</strong></h3>
+<ul>
+<li><strong>О чём:</strong> Эссе о кризисе классической музыки в современном мире.</li>
+<li><strong>Почему важно:</strong> Мартынов размышляет о том, как изменилась роль музыканта и композитора в постмодернистскую эпоху, и какие вызовы стоят перед искусством.</li>
+</ul>
+<hr>
+<h3 id="10-алекс-росс--другая-музыка-история-хх-века-2007">10. <strong>Алекс Росс – «Другая музыка. История ХХ века» (2007)</strong></h3>
+<ul>
+<li><strong>О чём:</strong> Обзор музыкальной культуры ХХ века, включая модернизм, авангард, джаз и популярную музыку.</li>
+<li><strong>Почему важно:</strong> Росс показывает, как музыка отражает политические и культурные изменения, исследуя её роль в обществе.</li>
+</ul>
+<hr>
+<h3 id="11-чарльз-розен--классический-стиль-гайдн-моцарт-бетховен-1971">11. <strong>Чарльз Розен – «Классический стиль: Гайдн, Моцарт, Бетховен» (1971)</strong></h3>
+<ul>
+<li><strong>О чём:</strong> Исследование классической эпохи в музыке, сосредоточенное на стилях трёх великих композиторов.</li>
+<li><strong>Почему важно:</strong> Розен показывает, как структура и гармония их произведений отражают дух эпохи и новаторство.</li>
+</ul>
+<hr>
+<h3 id="12-михаил-жванецкий--размышления-у-рояля-сборник-эссе">12. <strong>Михаил Жванецкий – «Размышления у рояля» (сборник эссе)</strong></h3>
+<ul>
+<li><strong>О чём:</strong> Сборник эссе и размышлений о музыке, её влиянии на жизнь и культуру.</li>
+<li><strong>Почему важно:</strong> Жванецкий с юмором и глубиной рассказывает о значении музыки для человека, затрагивая её эстетическую и эмоциональную природу.</li>
+</ul>
+<hr>
+<h3 id="итог-1">Итог</h3>
+<p>Эти работы помогают понять музыку с разных сторон — философской, биографической, научной и культурной. Они раскрывают, как музыка влияет на личность, общество и историю, а также как великие музыканты превращали свои переживания в бессмертное искусство.</p>
+<h2 id="про-скрипку">про скрипку</h2>
+<p>Скрипка — символ страсти, изящества и мастерства, поэтому истории о скрипачах часто привлекают писателей. Такие произведения исследуют тонкий мир музыки, творческих поисков, одержимости и внутренней борьбы. Вот список литературных произведений, где скрипачи играют ключевую роль:</p>
+<hr>
+<h3 id="1-анна-энквист--скрипач-1994">1. <strong>Анна Энквист – «Скрипач» (1994)</strong></h3>
+<ul>
+<li><strong>О чём:</strong> История скрипачки Йет, которая переживает смерть своего ребёнка и пытается справиться с утратой через музыку.</li>
+<li><strong>Почему важно:</strong> Роман исследует эмоциональное взаимодействие музыки и горя, показывая, как искусство может быть средством самовыражения и исцеления.</li>
+</ul>
+<hr>
+<h3 id="2-патрик-зюскинд--контрабас-1981">2. <strong>Патрик Зюскинд – «Контрабас» (1981)</strong></h3>
+<ul>
+<li><strong>О чём:</strong> Монолог музыканта, который размышляет о своей жизни и своей роли в оркестре.</li>
+<li><strong>Почему важно:</strong> Хотя герой играет на контрабасе, произведение затрагивает общие для всех музыкантов чувства: преданность своему инструменту, борьбу с ограничениями и поиск смысла в искусстве.</li>
+</ul>
+<hr>
+<h3 id="3-ян-галяр--скрипка-ротшильда-1894">3. <strong>Ян Галяр – «Скрипка Ротшильда» (1894)</strong></h3>
+<ul>
+<li><strong>О чём:</strong> Рассказ А. П. Чехова о жизни пожилого гробовщика Якова, который владеет скрипкой. В его старости скрипка становится единственным утешением.</li>
+<li><strong>Почему важно:</strong> Чехов показывает, как музыка помогает герою выразить подавленные чувства и обрести человечность в конце жизни.</li>
+</ul>
+<hr>
+<h3 id="4-жан-кристоф-гранже--скрипка-страдивари-2006">4. <strong>Жан-Кристоф Гранже – «Скрипка Страдивари» (2006)</strong></h3>
+<ul>
+<li><strong>О чём:</strong> История о поиске загадочной скрипки, которую связывают с мистическими событиями и преступлениями.</li>
+<li><strong>Почему важно:</strong> Роман соединяет в себе элементы детектива, триллера и музыки, подчёркивая мистическую привлекательность скрипки.</li>
+</ul>
+<hr>
+<h3 id="5-генрик-сенкевич--янко-музыкант-1879">5. <strong>Генрик Сенкевич – «Янко-музыкант» (1879)</strong></h3>
+<ul>
+<li><strong>О чём:</strong> Трогательная история мальчика-сироты Янко, который мечтает научиться играть на скрипке, несмотря на бедность и трудности.</li>
+<li><strong>Почему важно:</strong> Рассказ Сенкевича показывает, как музыка становится воплощением мечты и надежды, способной преодолеть жизненные испытания.</li>
+</ul>
+<hr>
+<h3 id="6-джеймс-ласт--скрипач">6. <strong>Джеймс Ласт – «Скрипач»</strong></h3>
+<ul>
+<li><strong>О чём:</strong> История виртуоза, который сталкивается с психологическими трудностями в профессии и личной жизни.</li>
+<li><strong>Почему важно:</strong> Произведение исследует тонкости внутреннего мира музыканта и его отношения с искусством.</li>
+</ul>
+<hr>
+<h3 id="7-томас-манн--тристан-1903">7. <strong>Томас Манн – «Тристан» (1903)</strong></h3>
+<ul>
+<li><strong>О чём:</strong> Новелла, в которой музыка, исполняемая героиней на скрипке, становится символом трагической любви и утраты.</li>
+<li><strong>Почему важно:</strong> Манн исследует эмоциональную силу музыки, её способность создавать и разрушать связи между людьми.</li>
+</ul>
+<hr>
+<h3 id="8-михаил-кузмин--крылья-1906">8. <strong>Михаил Кузмин – «Крылья» (1906)</strong></h3>
+<ul>
+<li><strong>О чём:</strong> История юного музыканта, который ищет своё место в мире и своё понимание искусства.</li>
+<li><strong>Почему важно:</strong> Скрипка здесь становится символом творческого начала, способного раскрыть внутренний мир героя.</li>
+</ul>
+<hr>
+<h3 id="9-дмитрий-быков--оправдание-2001">9. <strong>Дмитрий Быков – «Оправдание» (2001)</strong></h3>
+<ul>
+<li><strong>О чём:</strong> Роман, где скрипка играет важную символическую роль, связывая судьбы героев.</li>
+<li><strong>Почему важно:</strong> Быков обращается к теме искусства как к инструменту, способному менять судьбы людей.</li>
+</ul>
+<hr>
+<h3 id="10-александр-грин--скрипка-неизвестного-мастера">10. <strong>Александр Грин – «Скрипка неизвестного мастера»</strong></h3>
+<ul>
+<li><strong>О чём:</strong> Романтический рассказ о музыканте, который находит уникальную скрипку и открывает её магическое звучание.</li>
+<li><strong>Почему важно:</strong> Грин подчёркивает волшебство музыки и её способность преобразовывать жизнь.</li>
+</ul>
+<hr>
+<h3 id="11-эрика-александер--зов-скрипки">11. <strong>Эрика Александер – «Зов скрипки»</strong></h3>
+<ul>
+<li><strong>О чём:</strong> История девушки, которая начинает осваивать скрипку и обнаруживает свои глубинные способности.</li>
+<li><strong>Почему важно:</strong> Роман исследует личное становление героя через искусство и упорный труд.</li>
+</ul>
+<hr>
+<h3 id="итог-2">Итог</h3>
+<p>Скрипка в литературе часто становится символом одержимости, страсти и глубоких эмоциональных переживаний. Эти произведения погружают читателя в сложный мир музыкантов, где музыка — это не только искусство, но и средство борьбы, выражения и духовного роста.</p>
+<h2 id=""></h2>
+
+            
+            <script async type="text/javascript">
+/* From extension marp-team.marp-vscode */
+(()=>{var W=Object.defineProperty;var K=(w,h,x)=>h in w?W(w,h,{enumerable:!0,configurable:!0,writable:!0,value:x}):w[h]=x;var o=(w,h)=>W(w,"name",{value:h,configurable:!0});var v=(w,h,x)=>K(w,typeof h!="symbol"?h+"":h,x);(()=>{var w={32:(y,S,g)=>{y.exports=g(924)},924:(y,S)=>{"use strict";var g;g={value:!0};const E={h1:{proto:o(()=>HTMLHeadingElement,"proto"),attrs:{role:"heading","aria-level":"1"},style:"display: block; font-size: 2em; margin-block-start: 0.67em; margin-block-end: 0.67em; margin-inline-start: 0px; margin-inline-end: 0px; font-weight: bold;"},h2:{proto:o(()=>HTMLHeadingElement,"proto"),attrs:{role:"heading","aria-level":"2"},style:"display: block; font-size: 1.5em; margin-block-start: 0.83em; margin-block-end: 0.83em; margin-inline-start: 0px; margin-inline-end: 0px; font-weight: bold;"},h3:{proto:o(()=>HTMLHeadingElement,"proto"),attrs:{role:"heading","aria-level":"3"},style:"display: block; font-size: 1.17em; margin-block-start: 1em; margin-block-end: 1em; margin-inline-start: 0px; margin-inline-end: 0px; font-weight: bold;"},h4:{proto:o(()=>HTMLHeadingElement,"proto"),attrs:{role:"heading","aria-level":"4"},style:"display: block; margin-block-start: 1.33em; margin-block-end: 1.33em; margin-inline-start: 0px; margin-inline-end: 0px; font-weight: bold;"},h5:{proto:o(()=>HTMLHeadingElement,"proto"),attrs:{role:"heading","aria-level":"5"},style:"display: block; font-size: 0.83em; margin-block-start: 1.67em; margin-block-end: 1.67em; margin-inline-start: 0px; margin-inline-end: 0px; font-weight: bold;"},h6:{proto:o(()=>HTMLHeadingElement,"proto"),attrs:{role:"heading","aria-level":"6"},style:"display: block; font-size: 0.67em; margin-block-start: 2.33em; margin-block-end: 2.33em; margin-inline-start: 0px; margin-inline-end: 0px; font-weight: bold;"},span:{proto:o(()=>HTMLSpanElement,"proto")},pre:{proto:o(()=>HTMLElement,"proto"),style:"display: block; font-family: monospace; white-space: pre; margin: 1em 0; --marp-auto-scaling-white-space: pre;"}},A="data-marp-auto-scaling-wrapper",p="data-marp-auto-scaling-svg",c="data-marp-auto-scaling-container",T=class T extends HTMLElement{constructor(){super();v(this,"container");v(this,"containerSize");v(this,"containerObserver");v(this,"svg");v(this,"svgComputedStyle");v(this,"svgPreserveAspectRatio","xMinYMid meet");v(this,"wrapper");v(this,"wrapperSize");v(this,"wrapperObserver");const s=o(t=>([e])=>{const{width:n,height:r}=e.contentRect;this[t]={width:n,height:r},this.updateSVGRect()},"e");this.attachShadow({mode:"open"}),this.containerObserver=new ResizeObserver(s("containerSize")),this.wrapperObserver=new ResizeObserver((...t)=>{s("wrapperSize")(...t),this.flushSvgDisplay()})}static get observedAttributes(){return["data-downscale-only"]}connectedCallback(){this.shadowRoot.innerHTML=`
+<style>
+  svg[${p}] { display: block; width: 100%; height: auto; vertical-align: top; }
+  span[${c}] { display: table; white-space: var(--marp-auto-scaling-white-space, nowrap); width: max-content; }
+</style>
+<div ${A}>
+  <svg part="svg" ${p}>
+    <foreignObject><span ${c}><slot></slot></span></foreignObject>
+  </svg>
+</div>
+    `.split(/\n\s*/).join(""),this.wrapper=this.shadowRoot.querySelector(`div[${A}]`)??void 0;const s=this.svg;this.svg=this.wrapper?.querySelector(`svg[${p}]`)??void 0,this.svg!==s&&(this.svgComputedStyle=this.svg?window.getComputedStyle(this.svg):void 0),this.container=this.svg?.querySelector(`span[${c}]`)??void 0,this.observe()}disconnectedCallback(){this.svg=void 0,this.svgComputedStyle=void 0,this.wrapper=void 0,this.container=void 0,this.observe()}attributeChangedCallback(){this.observe()}flushSvgDisplay(){const{svg:s}=this;s&&(s.style.display="inline",requestAnimationFrame(()=>{s.style.display=""}))}observe(){this.containerObserver.disconnect(),this.wrapperObserver.disconnect(),this.wrapper&&this.wrapperObserver.observe(this.wrapper),this.container&&this.containerObserver.observe(this.container),this.svgComputedStyle&&this.observeSVGStyle(this.svgComputedStyle)}observeSVGStyle(s){const t=o(()=>{const e=(()=>{const n=s.getPropertyValue("--preserve-aspect-ratio");return n?n.trim():`x${(({textAlign:r,direction:l})=>{if(r.endsWith("left"))return"Min";if(r.endsWith("right"))return"Max";if(r==="start"||r==="end"){let d=l==="rtl";return r==="end"&&(d=!d),d?"Max":"Min"}return"Mid"})(s)}YMid meet`})();e!==this.svgPreserveAspectRatio&&(this.svgPreserveAspectRatio=e,this.updateSVGRect()),s===this.svgComputedStyle&&requestAnimationFrame(t)},"t");t()}updateSVGRect(){let s=Math.ceil(this.containerSize?.width??0);const t=Math.ceil(this.containerSize?.height??0);this.dataset.downscaleOnly!==void 0&&(s=Math.max(s,this.wrapperSize?.width??0));const e=this.svg?.querySelector(":scope > foreignObject");if(e?.setAttribute("width",`${s}`),e?.setAttribute("height",`${t}`),this.svg&&(this.svg.setAttribute("viewBox",`0 0 ${s} ${t}`),this.svg.setAttribute("preserveAspectRatio",this.svgPreserveAspectRatio),this.svg.style.height=s<=0||t<=0?"0":""),this.container){const n=this.svgPreserveAspectRatio.toLowerCase();this.container.style.marginLeft=n.startsWith("xmid")||n.startsWith("xmax")?"auto":"0",this.container.style.marginRight=n.startsWith("xmi")?"auto":"0"}}};o(T,"s");let i=T;const m=o((a,{attrs:u={},style:s})=>class extends a{constructor(...t){super(...t);for(const[e,n]of Object.entries(u))this.hasAttribute(e)||this.setAttribute(e,n);this._shadow()}static get observedAttributes(){return["data-auto-scaling"]}connectedCallback(){this._update()}attributeChangedCallback(){this._update()}_shadow(){if(!this.shadowRoot)try{this.attachShadow({mode:"open"})}catch(t){if(!(t instanceof Error&&t.name==="NotSupportedError"))throw t}return this.shadowRoot}_update(){const t=this._shadow();if(t){const e=s?`<style>:host { ${s} }</style>`:"";let n="<slot></slot>";const{autoScaling:r}=this.dataset;r!==void 0&&(n=`<marp-auto-scaling exportparts="svg:auto-scaling" ${r==="downscale-only"?"data-downscale-only":""}>${n}</marp-auto-scaling>`),t.innerHTML=e+n}}},"r");let b;const z=Symbol();let $;const V="marpitSVGPolyfill:setZoomFactor,",C=Symbol(),j=Symbol(),G=o(()=>{const a=navigator.vendor==="Apple Computer, Inc.",u=a?[D]:[],s={then:o(t=>(a?(async()=>{if($===void 0){const e=document.createElement("canvas");e.width=10,e.height=10;const n=e.getContext("2d"),r=new Image(10,10),l=new Promise(d=>{r.addEventListener("load",()=>d())});r.crossOrigin="anonymous",r.src="data:image/svg+xml;charset=utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2210%22%20height%3D%2210%22%20viewBox%3D%220%200%201%201%22%3E%3CforeignObject%20width%3D%221%22%20height%3D%221%22%20requiredExtensions%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxhtml%22%3E%3Cdiv%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxhtml%22%20style%3D%22width%3A%201px%3B%20height%3A%201px%3B%20background%3A%20red%3B%20position%3A%20relative%22%3E%3C%2Fdiv%3E%3C%2FforeignObject%3E%3C%2Fsvg%3E",await l,n.drawImage(r,0,0),$=n.getImageData(5,5,1,1).data[3]<128}return $})().then(e=>{t?.(e?[D]:[])}):t?.([]),s),"then")};return Object.assign(u,s)},"g");let H,O;function D(a){const u=typeof a=="object"&&a.target||document,s=typeof a=="object"?a.zoom:a;window[j]||(Object.defineProperty(window,j,{configurable:!0,value:!0}),document.body.style.zoom=1.0001,document.body.offsetHeight,document.body.style.zoom=1,window.addEventListener("message",({data:e,origin:n})=>{if(n===window.origin)try{if(e&&typeof e=="string"&&e.startsWith(V)){const[,r]=e.split(","),l=Number.parseFloat(r);Number.isNaN(l)||(O=l)}}catch(r){console.error(r)}}));let t=!1;Array.from(u.querySelectorAll("svg[data-marpit-svg]"),e=>{var n,r,l,d;e.style.transform||(e.style.transform="translateZ(0)");const f=s||O||e.currentScale||1;H!==f&&(H=f,t=f);const P=e.getBoundingClientRect(),{length:Z}=e.children;for(let F=0;F<Z;F+=1){const k=e.children[F];if(k.getScreenCTM){const _=k.getScreenCTM();if(_){const Y=(r=(n=k.x)===null||n===void 0?void 0:n.baseVal.value)!==null&&r!==void 0?r:0,U=(d=(l=k.y)===null||l===void 0?void 0:l.baseVal.value)!==null&&d!==void 0?d:0,J=k.children.length;for(let R=0;R<J;R+=1){const N=k.children[R];if(N.tagName==="SECTION"){const{style:q}=N;q.transformOrigin||(q.transformOrigin=`${-Y}px ${-U}px`),q.transform=`scale(${f}) matrix(${_.a}, ${_.b}, ${_.c}, ${_.d}, ${_.e-P.left}, ${_.f-P.top}) translateZ(0.0001px)`;break}}}}}}),t!==!1&&Array.from(u.querySelectorAll("iframe"),({contentWindow:e})=>{e?.postMessage(`${V}${t}`,window.origin==="null"?"*":window.origin)})}o(D,"u");function B({once:a=!1,target:u=document}={}){const s=function(t=document){if(t[C])return t[C];let e=!0;const n=o(()=>{e=!1,delete t[C]},"i");Object.defineProperty(t,C,{configurable:!0,value:n});let r=[],l=!1;(async()=>{try{r=await G()}finally{l=!0}})();const d=o(()=>{for(const f of r)f({target:t});l&&r.length===0||e&&window.requestAnimationFrame(d)},"r");return d(),n}(u);return a?(s(),()=>{}):s}o(B,"v"),H=1,O=void 0;const I=B,M=Symbol(),L=o((a=document)=>{if(typeof window>"u")throw new Error("Marp Core's browser script is valid only in browser context.");if(((e=document)=>{const n=window[z];n||customElements.define("marp-auto-scaling",i);for(const r of Object.keys(E)){const l=`marp-${r}`,d=E[r].proto();(b??(b=!!document.createElement("div",{is:"marp-auto-scaling"}).outerHTML.startsWith("<div is"),b))&&d!==HTMLElement?n||customElements.define(l,m(d,{style:E[r].style}),{extends:r}):(n||customElements.define(l,m(HTMLElement,E[r])),e.querySelectorAll(`${r}[is="${l}"]`).forEach(f=>{f.outerHTML=f.outerHTML.replace(new RegExp(`^<${r}`,"i"),`<${l}`).replace(new RegExp(`</${r}>$`,"i"),`</${l}>`)}))}window[z]=!0})(a),a[M])return a[M];const u=B({target:a}),s=o(()=>{u(),delete a[M]},"n"),t=Object.assign(s,{cleanup:s,update:o(()=>L(a),"update")});return Object.defineProperty(a,M,{configurable:!0,value:t}),t},"y");S.browser=L,g=L,g=I}},h={};function x(y){var S=h[y];if(S!==void 0)return S.exports;var g=h[y]={exports:{}};return w[y](g,g.exports,x),g.exports}o(x,"__webpack_require__");var Q={};(()=>{"use strict";var y=x(32);function S(){let p,c;const i=o(()=>{const m=document.getElementById("__marp-vscode"),b=!!m;p!==b?(document.body.classList.toggle("marp-vscode",b),b?c=(0,y.browser)():(c?.cleanup(),c=void 0),p=b):b&&c?.update(),p?(m&&g(m),E()):A()},"updateCallback");window.addEventListener("load",()=>window.setTimeout(i,100)),window.addEventListener("vscode.markdown.updateContent",i),i()}o(S,"preview");const g=o(p=>{p.querySelectorAll("[is]").forEach(c=>{if(c.nodeName.includes("-")||document.createElement(c.nodeName).constructor!==c.constructor)return;const{outerHTML:m}=c;c.outerHTML=m,console.debug("[marp-vscode] Custom element has been upgraded forcibly:",m.slice(0,m.indexOf(">")+1||void 0))})},"forceUpgradeCustomElements"),E=o(()=>{const p=document.querySelectorAll("style:not(#__marp-vscode-style,#_defaultStyles,[data-marp-vscode-body])"),c=document.querySelectorAll('link[rel="stylesheet"][href]:not([href*="marp-vscode"])');p.forEach(i=>{i.closest("#__marp-vscode")||(i.dataset.marpVscodeBody=i.textContent??"",i.textContent="")}),c.forEach(i=>{if(i.closest("#__marp-vscode"))return;const{href:m}=i;i.dataset.marpVscodeHref=m,i.removeAttribute("href")})},"removeStyles"),A=o(()=>{const p=document.querySelectorAll("style[data-marp-vscode-body]"),c=document.querySelectorAll("link[data-marp-vscode-href]");p.forEach(i=>{i.textContent=i.dataset.marpVscodeBody||"",delete i.dataset.marpVscodeBody}),c.forEach(i=>{i.href=i.dataset.marpVscodeHref||"",delete i.dataset.marpVscodeHref})},"restoreStyles");S()})()})();})();
+
+</script>
+
+        </body>
+        </html>
