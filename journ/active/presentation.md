@@ -91,6 +91,8 @@
 
 Схема как можно было бы сделать
 
+![active/ilhamMaterial/present/shemaRus.png](ilhamMaterial/present/shemaRus.png)
+
 **12honarSaylay**
 
 ## 1.17. упадничество / төшенкелек
